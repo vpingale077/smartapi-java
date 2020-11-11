@@ -1,4 +1,4 @@
-package com.angelbroking.smartapi.test;
+package com.angelbroking.smartapi.sample;
 
 import com.angelbroking.smartapi.SmartConnect;
 import com.angelbroking.smartapi.http.SessionExpiryHook;

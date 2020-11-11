@@ -1,4 +1,4 @@
-package com.angelbroking.smartapi.test;
+package com.angelbroking.smartapi.sample;
 
 import java.io.IOException;
 import java.util.List;
