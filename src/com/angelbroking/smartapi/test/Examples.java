@@ -17,7 +17,7 @@ public class Examples {
 
 	public void getProfile(SmartConnect smartConnect) throws IOException, SmartAPIException {
 		User profile = smartConnect.getProfile();
-		System.out.println("User Profile: "+profile.getUserName());
+		System.out.println("User Profile: " + profile.getUserName());
 	}
 
 	/** Place order. */
@@ -31,8 +31,8 @@ public class Examples {
 		 * order model
 		 *
 		 * Following is an example param for LIMIT order, if a call fails then
-		 * KiteException will have error message in it Success of this call implies only
-		 * order has been placed successfully, not order execution.
+		 * SmartAPIException will have error message in it Success of this call implies
+		 * only order has been placed successfully, not order execution.
 		 */
 
 		OrderParams orderParams = new OrderParams();
@@ -48,7 +48,7 @@ public class Examples {
 		// characters and only alphanumeric is allowed
 
 		Order order = smartConnect.placeOrder(orderParams, Constants.VARIETY_REGULAR);
-		System.out.println("orderId: "+order.orderId);
+		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Modify order. */
@@ -66,7 +66,7 @@ public class Examples {
 		orderParams.price = 122.2;
 
 		Order order = smartConnect.modifyOrder("201009000000015", orderParams, Constants.VARIETY_REGULAR);
-		System.out.println("orderId: "+order.orderId);
+		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Cancel an order */
@@ -75,7 +75,7 @@ public class Examples {
 		// order_id.
 		// Cancel order will return order model which will only have orderId.
 		Order order = smartConnect.cancelOrder("201009000000015", Constants.VARIETY_REGULAR);
-		System.out.println("orderId: "+order.orderId);
+		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Get order details */
@@ -106,7 +106,7 @@ public class Examples {
 		for (int i = 0; i < trades.size(); i++) {
 			System.out.println(trades.get(i).tradingSymbol + " " + trades.size());
 		}
-		System.out.println("Trade Size: "+trades.size());
+		System.out.println("Trade Size: " + trades.size());
 	}
 
 	/** Get RMS */
@@ -156,6 +156,13 @@ public class Examples {
 		requestObejct.put("type", "DAY");
 		JSONObject response = smartConnect.getPosition();
 		System.out.println(response);
+	}
+
+	/** Logout user. */
+	public void logout(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		/** Logout user and kill session. */
+		JSONObject jsonObject = smartConnect.logout();
+		System.out.println(jsonObject);
 	}
 
 }

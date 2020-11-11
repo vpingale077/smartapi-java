@@ -7,8 +7,13 @@ package com.angelbroking.smartapi.http.exceptions;
 
 public class OrderException extends SmartAPIException {
 
-    // initialize Order Exception and call base exception constructor
-    public OrderException(String message, int code){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// initialize Order Exception and call base exception constructor
+    public OrderException(String message, String code){
         super(message, code);
     }
 }

@@ -32,7 +32,7 @@ public class Test {
 			System.out.println("getProfile");
 			examples.getProfile(smartConnect);
 
-			System.out.println("getProfile");
+			System.out.println("placeOrder");
 			examples.placeOrder(smartConnect);
 
 			System.out.println("modifyOrder");
@@ -61,6 +61,9 @@ public class Test {
 
 			System.out.println("convertPosition");
 			examples.convertPosition(smartConnect);
+
+			System.out.println("logout");
+			examples.logout(smartConnect);
 
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());

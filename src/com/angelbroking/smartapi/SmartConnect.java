@@ -142,7 +142,7 @@ public class SmartConnect {
 	 * @param apiSecret    which is unique for each aap.
 	 * @return User is the user model which contains user and session details.
 	 * @throws SmartAPIException
-	 * @throws KiteException     is thrown for all Kite trade related errors.
+	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
 	 * @throws JSONException     is thrown when there is exception while parsing
 	 *                           response.
 	 * @throws IOException       is thrown when there is connection error.
@@ -150,8 +150,8 @@ public class SmartConnect {
 	public User generateSession(String clientCode, String password)
 			throws SmartAPIException, JSONException, IOException {
 		smartAPIRequestHandler = new SmartAPIRequestHandler(proxy);
-		//System.out.println("clientCode:" + clientCode);
-		//System.out.println("password:" + password);
+		// System.out.println("clientCode:" + clientCode);
+		// System.out.println("password:" + password);
 
 		// Create JSON params object needed to be sent to api.
 		JSONObject params = new JSONObject();
@@ -176,8 +176,8 @@ public class SmartConnect {
 	 * @param refreshToken is the refresh token obtained after generateSession.
 	 * @param apiSecret    is unique for each app.
 	 * @return TokenSet contains user id, refresh token, api secret.
-	 * @throws IOException   is thrown when there is connection error.
-	 * @throws KiteException is thrown for all Kite trade related errors.
+	 * @throws IOException       is thrown when there is connection error.
+	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
 	 */
 	public TokenSet renewAccessToken(String accessToken, String refreshToken)
 			throws IOException, SmartAPIException, JSONException {
@@ -189,7 +189,7 @@ public class SmartConnect {
 		params.put("checksum", sha256hex);
 		String url = routes.get("api.refresh");
 		JSONObject response = smartAPIRequestHandler.postRequest(url, params, accessToken);
-		//System.out.println(response);
+		// System.out.println(response);
 
 		accessToken = response.getJSONObject("data").getString("jwtToken");
 		refreshToken = response.getJSONObject("data").getString("refreshToken");
@@ -220,8 +220,8 @@ public class SmartConnect {
 	 * Get the profile details of the use.
 	 * 
 	 * @return Profile is a POJO which contains profile related data.
-	 * @throws IOException   is thrown when there is connection error.
-	 * @throws KiteException is thrown for all Kite trade related errors.
+	 * @throws IOException       is thrown when there is connection error.
+	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
 	 */
 	public User getProfile() throws IOException, SmartAPIException, JSONException {
 		String url = routes.get("api.user.profile");
@@ -236,10 +236,10 @@ public class SmartConnect {
 	 * @param variety     variety="regular". Order variety can be bo, co, amo,
 	 *                    regular.
 	 * @return Order contains only orderId.
-	 * @throws KiteException is thrown for all Kite trade related errors.
-	 * @throws JSONException is thrown when there is exception while parsing
-	 *                       response.
-	 * @throws IOException   is thrown when there is connection error.
+	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
+	 * @throws JSONException     is thrown when there is exception while parsing
+	 *                           response.
+	 * @throws IOException       is thrown when there is connection error.
 	 */
 	public Order placeOrder(OrderParams orderParams, String variety)
 			throws SmartAPIException, JSONException, IOException {
@@ -270,11 +270,11 @@ public class SmartConnect {
 //		if (orderParams.variety != null)
 		params.put("variety", variety);
 
-		//System.out.println("Params: " + params);
+		// System.out.println("Params: " + params);
 
 		JSONObject jsonObject = smartAPIRequestHandler.postRequest(url, params, accessToken);
 
-		//System.out.println(jsonObject);
+		// System.out.println(jsonObject);
 		Order order = new Order();
 		order.orderId = jsonObject.getJSONObject("data").getString("orderid");
 		return order;
@@ -288,10 +288,10 @@ public class SmartConnect {
 	 *                    regular.
 	 * @param orderId     order id of the order being modified.
 	 * @return Order object contains only orderId.
-	 * @throws KiteException is thrown for all Kite trade related errors.
-	 * @throws JSONException is thrown when there is exception while parsing
-	 *                       response.
-	 * @throws IOException   is thrown when there is connection error.
+	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
+	 * @throws JSONException     is thrown when there is exception while parsing
+	 *                           response.
+	 * @throws IOException       is thrown when there is connection error.
 	 */
 	public Order modifyOrder(String orderId, OrderParams orderParams, String variety)
 			throws SmartAPIException, JSONException, IOException {
@@ -323,11 +323,11 @@ public class SmartConnect {
 		params.put("variety", variety);
 		params.put("orderid", orderId);
 
-		//System.out.println("Params: " + params);
+		// System.out.println("Params: " + params);
 
 		JSONObject jsonObject = smartAPIRequestHandler.postRequest(url, params, accessToken);
 
-		//System.out.println(jsonObject);
+		// System.out.println(jsonObject);
 		Order order = new Order();
 		order.orderId = jsonObject.getJSONObject("data").getString("orderid");
 		return order;
@@ -383,7 +383,7 @@ public class SmartConnect {
 			for (Iterator iterator = orderList.iterator(); iterator.hasNext();) {
 				Order order = (Order) iterator.next();
 
-				//System.out.println(order.toString());
+				// System.out.println(order.toString());
 			}
 			System.out.println(orderList.toString());
 			return orderList;// Arrays.asList(order);
@@ -428,7 +428,7 @@ public class SmartConnect {
 	public List<Trade> getTrades() throws SmartAPIException, JSONException, IOException {
 		String url = routes.get("api.order.trade.book");
 		JSONObject response = smartAPIRequestHandler.getRequest(url, accessToken);
-		//System.out.println(response.toString());
+		// System.out.println(response.toString());
 		return Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), Trade[].class));
 	}
 
@@ -444,7 +444,7 @@ public class SmartConnect {
 	public JSONObject getRMS() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.data");
 		JSONObject response = smartAPIRequestHandler.getRequest(url, accessToken);
-		//System.out.println(response.toString());
+		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -460,7 +460,7 @@ public class SmartConnect {
 	public JSONObject getHolding() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.holding");
 		JSONObject response = smartAPIRequestHandler.getRequest(url, accessToken);
-		//System.out.println(response.toString());
+		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -476,7 +476,7 @@ public class SmartConnect {
 	public JSONObject getPosition() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.position");
 		JSONObject response = smartAPIRequestHandler.getRequest(url, accessToken);
-		//System.out.println(response.toString());
+		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -492,7 +492,24 @@ public class SmartConnect {
 	public JSONObject convertPosition(JSONObject params) throws SmartAPIException, IOException, JSONException {
 		String url = routes.get("api.order.rms.position.convert");
 		JSONObject response = smartAPIRequestHandler.postRequest(url, params, accessToken);
-		//System.out.println(response.toString());
+		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
+
+	/**
+	 * Logs out user by invalidating the access token.
+	 * 
+	 * @return JSONObject which contains status
+	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
+	 * @throws IOException       is thrown when there is connection related error.
+	 */
+	public JSONObject logout() throws SmartAPIException, IOException, JSONException {
+
+		String url = routes.get("api.user.logout");
+		JSONObject params = new JSONObject();
+		params.put("clientcode", this.userId);
+		JSONObject response = smartAPIRequestHandler.postRequest(url, params, accessToken);
+		return response.getJSONObject("data");
+	}
+
 }

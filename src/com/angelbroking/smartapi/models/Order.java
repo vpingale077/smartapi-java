@@ -2,8 +2,6 @@ package com.angelbroking.smartapi.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 /**
  * A wrapper for order.
  */

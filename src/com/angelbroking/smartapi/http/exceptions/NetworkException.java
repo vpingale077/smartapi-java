@@ -1,14 +1,19 @@
 package com.angelbroking.smartapi.http.exceptions;
 
 /**
- * Represents a network issue between Kite and the backend Order Management System (OMS).
+ * Represents a network issue between Smart API and the backend Order Management System (OMS).
  * Default code is 503.
  */
 
 public class NetworkException extends SmartAPIException {
 
-    // initialize Kite Network exception and call Base Exception constructor
-    public NetworkException(String message, int code){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// initialize Smart API Network exception and call Base Exception constructor
+    public NetworkException(String message, String code){
         super(message, code);
     }
 }

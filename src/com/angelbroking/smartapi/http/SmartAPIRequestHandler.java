@@ -32,7 +32,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class SmartAPIRequestHandler {
 
 	private OkHttpClient client;
-	private String USER_AGENT = "javakiteconnect/3.0.0";
+	private String USER_AGENT = "javasmartapiconnect/3.0.0";
 
 	/**
 	 * Initialize request handler.
@@ -64,7 +64,7 @@ public class SmartAPIRequestHandler {
 	 *                    process.
 	 * @param params      is the map of params which has to be sent in the body.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject postRequest(String url, JSONObject params) throws IOException, JSONException, SmartAPIException {
@@ -82,14 +82,14 @@ public class SmartAPIRequestHandler {
 	/**
 	 * Makes a POST request.
 	 * 
-	 * @return JSONObject which is received by Kite Trade.
+	 * @return JSONObject which is received by Smart API Trade.
 	 * @param url         is the endpoint to which request has to be sent.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param params      is the map of params which has to be sent in the body.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject postRequest(String url, JSONObject params, String accessToken)
@@ -104,13 +104,13 @@ public class SmartAPIRequestHandler {
 	 * Make a JSON POST request.
 	 * 
 	 * @param url         is the endpoint to which request has to be sent.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param jsonArray   is the JSON array of params which has to be sent in the
 	 *                    body.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject postRequestJSON(String url, JSONArray jsonArray, String apiKey, String accessToken)
@@ -124,14 +124,14 @@ public class SmartAPIRequestHandler {
 	/**
 	 * Makes a PUT request.
 	 * 
-	 * @return JSONObject which is received by Kite Trade.
+	 * @return JSONObject which is received by Smart API Trade.
 	 * @param url         is the endpoint to which request has to be sent.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param params      is the map of params which has to be sent in the body.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject putRequest(String url, Map<String, Object> params, String apiKey, String accessToken)
@@ -145,15 +145,15 @@ public class SmartAPIRequestHandler {
 	/**
 	 * Makes a DELETE request.
 	 * 
-	 * @return JSONObject which is received by Kite Trade.
+	 * @return JSONObject which is received by Smart API Trade.
 	 * @param url         is the endpoint to which request has to be sent.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param params      is the map of params which has to be sent in the query
 	 *                    params.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject deleteRequest(String url, Map<String, Object> params, String apiKey, String accessToken)
@@ -167,9 +167,9 @@ public class SmartAPIRequestHandler {
 	/**
 	 * Makes a GET request.
 	 * 
-	 * @return JSONObject which is received by Kite Trade.
+	 * @return JSONObject which is received by Smart API Trade.
 	 * @param url         is the endpoint to which request has to be sent.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param commonKey   is the key that has to be sent in query param for quote
@@ -177,7 +177,7 @@ public class SmartAPIRequestHandler {
 	 * @param values      is the values that has to be sent in query param like 265,
 	 *                    256265, NSE:INFY.
 	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
+	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
 	public JSONObject getRequest(String url, String accessToken) throws IOException, SmartAPIException, JSONException {
@@ -187,31 +187,12 @@ public class SmartAPIRequestHandler {
 		return new SmartAPIResponseHandler().handle(response, body);
 	}
 
-	/**
-	 * Makes GET request to fetch CSV dump.
-	 * 
-	 * @return String which is received from server.
-	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
-	 * @param accessToken is the access token obtained after successful login
-	 *                    process.
-	 * @throws IOException       is thrown when there is a connection related error.
-	 * @throws SmartAPIException is thrown for all Kite Trade related errors.
-	 */
-	public String getCSVRequest(String url, String apiKey, String accessToken)
-			throws IOException, SmartAPIException, JSONException {
-		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).header("X-Kite-Version", "3")
-				.header("Authorization", "token " + apiKey + ":" + accessToken).build();
-		Response response = client.newCall(request).execute();
-		String body = response.body().string();
-		return new SmartAPIResponseHandler().handle(response, body, "csv");
-	}
 
 	/**
 	 * Creates a GET request.
 	 * 
 	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @throws IOException
@@ -253,7 +234,7 @@ public class SmartAPIRequestHandler {
 	 * Creates a GET request.
 	 * 
 	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param commonKey   is the key that has to be sent in query param for quote
@@ -267,7 +248,7 @@ public class SmartAPIRequestHandler {
 			httpBuilder.addQueryParameter(commonKey, values[i]);
 		}
 		return new Request.Builder().url(httpBuilder.build()).header("User-Agent", USER_AGENT)
-				.header("X-Kite-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
 	}
 
 	/**
@@ -377,7 +358,7 @@ public class SmartAPIRequestHandler {
 	 * Create a POST request with body type JSON.
 	 * 
 	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param jsonArray   is the JSONArray of data that has to be sent in the body.
@@ -386,7 +367,7 @@ public class SmartAPIRequestHandler {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 		RequestBody body = RequestBody.create(jsonArray.toString(), JSON);
-		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).header("X-Kite-Version", "3")
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).header("X-Smart API-Version", "3")
 				.header("Authorization", "token " + apiKey + ":" + accessToken).post(body).build();
 		return request;
 	}
@@ -395,7 +376,7 @@ public class SmartAPIRequestHandler {
 	 * Creates a PUT request.
 	 * 
 	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param params      is the map of data that has to be sent in the body.
@@ -407,7 +388,7 @@ public class SmartAPIRequestHandler {
 		}
 		RequestBody requestBody = builder.build();
 		Request request = new Request.Builder().url(url).put(requestBody).header("User-Agent", USER_AGENT)
-				.header("X-Kite-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
 		return request;
 	}
 
@@ -415,7 +396,7 @@ public class SmartAPIRequestHandler {
 	 * Creates a DELETE request.
 	 * 
 	 * @param url         is the endpoint to which request has to be done.
-	 * @param apiKey      is the api key of the Kite Connect app.
+	 * @param apiKey      is the api key of the Smart API Connect app.
 	 * @param accessToken is the access token obtained after successful login
 	 *                    process.
 	 * @param params      is the map of data that has to be sent in the query
@@ -428,7 +409,7 @@ public class SmartAPIRequestHandler {
 		}
 
 		Request request = new Request.Builder().url(httpBuilder.build()).delete().header("User-Agent", USER_AGENT)
-				.header("X-Kite-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
 		return request;
 	}
 

@@ -1,7 +1,7 @@
 package com.angelbroking.smartapi.utils;
 
 /**
- * Contains all the Strings that are being used in the Kite Connect library.
+ * Contains all the Strings that are being used in the Smart API Connect library.
  */
 public class Constants {
 

@@ -22,54 +22,69 @@ import okhttp3.Response;
  */
 public class SmartAPIResponseHandler {
 
-    public JSONObject handle(Response response, String body) throws IOException, SmartAPIException, JSONException {
-        if (response.header("Content-Type").contains("json")) {
-            JSONObject jsonObject = new JSONObject(body);
-            if(jsonObject.has("error_type")) {
-                throw dealWithException(jsonObject, response.code());
-            }
-            return jsonObject;
-        } else {
-            throw new DataException("Unexpected content type received from server: "+ response.header("Content-Type")+" "+response.body().string(), 502);
-        }
-    }
+	public JSONObject handle(Response response, String body) throws IOException, SmartAPIException, JSONException {
+		if (response.header("Content-Type").contains("json")) {
+			JSONObject jsonObject = new JSONObject(body);
+			if (jsonObject.has("errorcode")) {
+//				System.out.println("jsonObjectException: " + jsonObject.toString());
+//				System.out.println("responseCodeException: " + response.code());
+				throw dealWithException(jsonObject, jsonObject.getString("errorcode"));
+			}
+			return jsonObject;
+		} else {
+			throw new DataException("Unexpected content type received from server: " + response.header("Content-Type")
+					+ " " + response.body().string(), "AG8001");
+		}
+	}
 
-    public String handle(Response response, String body, String type) throws IOException, SmartAPIException, JSONException {
-        if (response.header("Content-Type").contains("csv")) {
-            return body;
-        } else if(response.header("Content-Type").contains("json")){
-            throw dealWithException(new JSONObject(response.body().string()), response.code());
-        } else {
-            throw new DataException("Unexpected content type received from server: "+ response.header("Content-Type")+" "+response.body().string(), 502);
-        }
-    }
+	private SmartAPIException dealWithException(JSONObject jsonObject, String code) throws JSONException {
+		
 
+		switch (code) {
+		// if there is a token exception, generate a signal to logout the user.
+		case "AG8003":
+		case "AB8050":
+		case "AB8051":
+		case "AB1010":
+			if (SmartConnect.sessionExpiryHook != null) {
+				SmartConnect.sessionExpiryHook.sessionExpired();
+			}
+			return new TokenException(jsonObject.getString("message"), code);
 
-    private SmartAPIException dealWithException(JSONObject jsonObject, int code) throws JSONException {
-        String exception = jsonObject.getString("error_type");
+		case "AG8001":
+		case "AG8002":
+			return new DataException(jsonObject.getString("message"), code);
 
-        switch (exception){
-            // if there is a token exception, generate a signal to logout the user.
-            case "TokenException":
-                if(SmartConnect.sessionExpiryHook != null) {
-                	SmartConnect.sessionExpiryHook.sessionExpired();
-                }
-                return  new TokenException(jsonObject.getString("message"), code);
+		case "AB1004":
+		case "AB2000":
+			return new GeneralException(jsonObject.getString("message"), code);
 
-            case "DataException": return new DataException(jsonObject.getString("message"), code);
+		case "AB1003":
+		case "AB1005":
+		case "AB1012":
+		case "AB1002":
+			return new InputException(jsonObject.getString("message"), code);
 
-            case "GeneralException": return new GeneralException(jsonObject.getString("message"), code);
+		case "AB1008":
+		case "AB1009":
+		case "AB1013":
+		case "AB1014":
+		case "AB1015":
+		case "AB1016":
+		case "AB1017":
+			return new OrderException(jsonObject.getString("message"), code);
 
-            case "InputException": return new InputException(jsonObject.getString("message"), code);
+		case "NetworkException":
+			return new NetworkException(jsonObject.getString("message"), code);
 
-            case "OrderException": return new OrderException(jsonObject.getString("message"), code);
+		case "AB1000":
+		case "AB1001":
+		case "AB1011":
+			return new PermissionException(jsonObject.getString("message"), code);
 
-            case "NetworkException": return new NetworkException(jsonObject.getString("message"), code);
-
-            case "PermissionException": return new PermissionException(jsonObject.getString("message"), code);
-
-            default: return new SmartAPIException(jsonObject.getString("message"), code);
-        }
-    }
+		default:
+			return new SmartAPIException(jsonObject.getString("message"), code);
+		}
+	}
 
 }

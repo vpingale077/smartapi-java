@@ -5,7 +5,12 @@ package com.angelbroking.smartapi.http.exceptions;
  * Default code is 403
  */
 public class PermissionException extends SmartAPIException {
-    public PermissionException(String message, int code){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public PermissionException(String message, String code){
         super(message, code);
     }
 }
