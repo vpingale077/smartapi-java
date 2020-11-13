@@ -3,7 +3,6 @@
 ##############################
 .mtj.tmp/
 *.class
-#*.jar
 *.war
 *.ear
 *.nar
@@ -22,17 +21,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-#.mvn/wrapper/maven-wrapper.jar
-
-##############################
-## Gradle
-##############################
-bin/
-build/
-.gradle
-.gradletasknamecache
-gradle-app.setting
-#!gradle-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
 
 ##############################
 ## IntelliJ
