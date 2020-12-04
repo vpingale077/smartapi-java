@@ -25,9 +25,13 @@ public class SmartAPIResponseHandler {
 	public JSONObject handle(Response response, String body) throws IOException, SmartAPIException, JSONException {
 		if (response.header("Content-Type").contains("json")) {
 			JSONObject jsonObject = new JSONObject(body);
-			boolean status = jsonObject.getBoolean("status");
-			if (!status) {
-				throw dealWithException(jsonObject, jsonObject.getString("errorcode"));
+			System.out.println("jsonObject: " + jsonObject.toString());
+			if (jsonObject.optString("data") == null || jsonObject.optString("data") == "") {
+				if (jsonObject.has("errorcode")) {
+					throw dealWithException(jsonObject, jsonObject.getString("errorcode"));
+				} else if (jsonObject.has("errorCode")) {
+					throw dealWithException(jsonObject, jsonObject.getString("errorCode"));
+				}
 			}
 			return jsonObject;
 		} else {

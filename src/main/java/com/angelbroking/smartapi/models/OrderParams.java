@@ -2,7 +2,7 @@ package com.angelbroking.smartapi.models;
 
 /** A wrapper for order params to be sent while placing an order. */
 public class OrderParams {
-	
+
 	public String orderid;
 	/**
 	 * Exchange in which instrument is listed (NSE, BSE, NFO, BFO, CDS, MCX).
@@ -56,12 +56,15 @@ public class OrderParams {
 	 * variety
 	 */
 
-	public Integer variety;
+	public String variety;
 
 	/**
 	 * Order duration (DAY, IOC).
 	 */
 
 	public String tradingsymbol;
+
+	public String squareoff;
+	public String stoploss;
 
 }

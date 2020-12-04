@@ -9,7 +9,11 @@ public class Test {
 
 	public static void main(String[] args) throws SmartAPIException {
 		try {
+
 			SmartConnect smartConnect = new SmartConnect();
+
+			// PROVIDE YOUR API KEY HERE
+			smartConnect.setApiKey("smartapi_key");
 
 			// Set session expiry callback.
 			smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
@@ -19,7 +23,7 @@ public class Test {
 				}
 			});
 
-			User user = smartConnect.generateSession("D88311", "Angel@444");
+			User user = smartConnect.generateSession("S212741", "pass@123");
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
 

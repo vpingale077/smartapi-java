@@ -11,6 +11,7 @@ public class Constants {
     public static String PRODUCT_NRML = "NRML";
 
     public static String PRODUCT_DELIVERY = "DELIVERY";
+    public static String PRODUCT_INTRADAY = "INTRADAY";
 
     /** Order types. */
     public static String ORDER_TYPE_MARKET = "MARKET";

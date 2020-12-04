@@ -18,6 +18,11 @@ public class SmartAPIException extends Throwable {
 		this.code = code;
 	}
 
+	// constructor that sets the message
+	public SmartAPIException(String message) {
+		this.message = message;
+	}
+
 	@Override
 	public String toString() {
 		return "SmartAPIException [message=" + message + ", code=" + code + "]";

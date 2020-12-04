@@ -67,14 +67,15 @@ public class SmartAPIRequestHandler {
 	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
-	public JSONObject postRequest(String url, JSONObject params) throws IOException, JSONException, SmartAPIException {
+	public JSONObject postRequest(String apiKey, String url, JSONObject params)
+			throws IOException, JSONException, SmartAPIException {
 
-		Request request = createPostRequest(url, params);
-		//System.out.println("request object: " + request.toString());
+		Request request = createPostRequest(apiKey, url, params);
+		// System.out.println("request object: " + request.toString());
 		Response response = client.newCall(request).execute();
-		//System.out.println(response);
+		// System.out.println(response);
 		String body = response.body().string();
-		//System.out.println(body);
+		// System.out.println(body);
 		return new SmartAPIResponseHandler().handle(response, body);
 
 	}
@@ -92,9 +93,9 @@ public class SmartAPIRequestHandler {
 	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
-	public JSONObject postRequest(String url, JSONObject params, String accessToken)
+	public JSONObject postRequest(String apiKey, String url, JSONObject params, String accessToken)
 			throws IOException, SmartAPIException, JSONException {
-		Request request = createPostRequest(url, params, accessToken);
+		Request request = createPostRequest(apiKey, url, params, accessToken);
 		Response response = client.newCall(request).execute();
 		String body = response.body().string();
 		return new SmartAPIResponseHandler().handle(response, body);
@@ -180,13 +181,13 @@ public class SmartAPIRequestHandler {
 	 * @throws SmartAPIException is thrown for all Smart API Trade related errors.
 	 * @throws JSONException     is thrown for parsing errors.
 	 */
-	public JSONObject getRequest(String url, String accessToken) throws IOException, SmartAPIException, JSONException {
-		Request request = createGetRequest(url, accessToken);
+	public JSONObject getRequest(String apiKey, String url, String accessToken)
+			throws IOException, SmartAPIException, JSONException {
+		Request request = createGetRequest(apiKey, url, accessToken);
 		Response response = client.newCall(request).execute();
 		String body = response.body().string();
 		return new SmartAPIResponseHandler().handle(response, body);
 	}
-
 
 	/**
 	 * Creates a GET request.
@@ -197,7 +198,7 @@ public class SmartAPIRequestHandler {
 	 *                    process.
 	 * @throws IOException
 	 */
-	public Request createGetRequest(String url, String accessToken) throws IOException {
+	public Request createGetRequest(String apiKey, String url, String accessToken) throws IOException {
 		HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 		// Local IP Address
 		InetAddress localHost = InetAddress.getLocalHost();
@@ -218,7 +219,7 @@ public class SmartAPIRequestHandler {
 		}
 		String macAddress = sb.toString();
 
-		String privateKey = "test";
+		String privateKey = apiKey;
 		String accept = "application/json";
 		String userType = "USER";
 		String sourceID = "WEB";
@@ -248,7 +249,8 @@ public class SmartAPIRequestHandler {
 			httpBuilder.addQueryParameter(commonKey, values[i]);
 		}
 		return new Request.Builder().url(httpBuilder.build()).header("User-Agent", USER_AGENT)
-				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken)
+				.build();
 	}
 
 	/**
@@ -260,10 +262,10 @@ public class SmartAPIRequestHandler {
 	 *                    process.
 	 * @param params      is the map of data that has to be sent in the body.
 	 */
-	public Request createPostRequest(String url, JSONObject params) {
+	public Request createPostRequest(String apiKey, String url, JSONObject params) {
 		try {
 
-			//System.out.println("started createPostRequest");
+			// System.out.println("started createPostRequest");
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 			RequestBody body = RequestBody.create(params.toString(), JSON);
 
@@ -286,7 +288,7 @@ public class SmartAPIRequestHandler {
 			}
 			String macAddress = sb.toString();
 
-			String privateKey = "test";
+			String privateKey = apiKey;
 			String accept = "application/json";
 			String userType = "USER";
 			String sourceID = "WEB";
@@ -312,7 +314,7 @@ public class SmartAPIRequestHandler {
 	 *                    process.
 	 * @param params      is the map of data that has to be sent in the body.
 	 */
-	public Request createPostRequest(String url, JSONObject params, String accessToken) {
+	public Request createPostRequest(String apiKey, String url, JSONObject params, String accessToken) {
 		try {
 
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -337,7 +339,7 @@ public class SmartAPIRequestHandler {
 			}
 			String macAddress = sb.toString();
 
-			String privateKey = "test";
+			String privateKey = apiKey;
 			String accept = "application/json";
 			String userType = "USER";
 			String sourceID = "WEB";
@@ -367,8 +369,9 @@ public class SmartAPIRequestHandler {
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
 		RequestBody body = RequestBody.create(jsonArray.toString(), JSON);
-		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).header("X-Smart API-Version", "3")
-				.header("Authorization", "token " + apiKey + ":" + accessToken).post(body).build();
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT)
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken)
+				.post(body).build();
 		return request;
 	}
 
@@ -388,7 +391,8 @@ public class SmartAPIRequestHandler {
 		}
 		RequestBody requestBody = builder.build();
 		Request request = new Request.Builder().url(url).put(requestBody).header("User-Agent", USER_AGENT)
-				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken)
+				.build();
 		return request;
 	}
 
@@ -409,7 +413,8 @@ public class SmartAPIRequestHandler {
 		}
 
 		Request request = new Request.Builder().url(httpBuilder.build()).delete().header("User-Agent", USER_AGENT)
-				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken).build();
+				.header("X-Smart API-Version", "3").header("Authorization", "token " + apiKey + ":" + accessToken)
+				.build();
 		return request;
 	}
 

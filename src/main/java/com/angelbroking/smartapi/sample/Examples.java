@@ -36,14 +36,19 @@ public class Examples {
 		 */
 
 		OrderParams orderParams = new OrderParams();
+		orderParams.variety = "NORMAL";
 		orderParams.quantity = 1;
-		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
-		orderParams.tradingsymbol = "ASHOKLEY";
-		orderParams.producttype = Constants.PRODUCT_DELIVERY;
+		orderParams.symbolToken = "3045";
+		orderParams.transactiontype = "BUY";
 		orderParams.exchange = Constants.EXCHANGE_NSE;
-		orderParams.transactiontype = Constants.TRANSACTION_TYPE_BUY;
+		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
+		orderParams.tradingsymbol = "SBIN-EQ";
+		orderParams.producttype = Constants.PRODUCT_INTRADAY;
 		orderParams.duration = Constants.VALIDITY_DAY;
+		orderParams.transactiontype = Constants.TRANSACTION_TYPE_BUY;
 		orderParams.price = 122.2;
+		orderParams.squareoff = "0";
+		orderParams.stoploss = "0";
 		// orderParams.tag = "myTag"; //tag is optional and it cannot be more than 8
 		// characters and only alphanumeric is allowed
 
@@ -132,28 +137,16 @@ public class Examples {
 
 	/** convert Position */
 	public void convertPosition(SmartConnect smartConnect) throws SmartAPIException, IOException {
+
 		JSONObject requestObejct = new JSONObject();
 		requestObejct.put("exchange", "NSE");
-		requestObejct.put("symboltoken", "2885");
-		requestObejct.put("producttype", "DELIVERY");
-		requestObejct.put("newproducttype", "INTRADAY");
-		requestObejct.put("tradingsymbol", "RELIANCE-EQ");
-		requestObejct.put("symbolname", "RELIANCE");
-		requestObejct.put("instrumenttype", "");
-		requestObejct.put("priceden", "1");
-		requestObejct.put("pricenum", "1");
-		requestObejct.put("genden", "1");
-		requestObejct.put("gennum", "1");
-		requestObejct.put("precision", "2");
-		requestObejct.put("multiplier", "-1");
-		requestObejct.put("boardlotsize", "1");
-		requestObejct.put("buyqty", "1");
-		requestObejct.put("sellqty", "0");
-		requestObejct.put("buyamount", "223580");
-		requestObejct.put("sellamount", "0");
+		requestObejct.put("oldproducttype", "DELIVERY");
+		requestObejct.put("newproducttype", "MARGIN");
+		requestObejct.put("tradingsymbol", "SBIN-EQ");
 		requestObejct.put("transactiontype", "BUY");
 		requestObejct.put("quantity", 1);
 		requestObejct.put("type", "DAY");
+
 		JSONObject response = smartConnect.getPosition();
 		System.out.println(response);
 	}
