@@ -18,6 +18,10 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 ```java
 // Initialize Samart API using clientcode and password.
 SmartConnect smartConnect = new SmartConnect();
+
+// PROVIDE YOUR API KEY HERE
+smartConnect.setApiKey("api_key");
+
 User user = smartConnect.generateSession("your_clientcode", "your_password");
 
 // Set token.
@@ -25,7 +29,6 @@ smartConnect.setAccessToken(user.getAccessToken());
 
 // Set userId.
 smartConnect.setUserId(user.getUserId());
-
 
 /* First you should get request_token, public_token using smartapi login and then use jwttoken smartapi call.
 Get login url. Use this url in webview to login user, after authenticating user you will get requestToken. Use the same to get accessToken. */
