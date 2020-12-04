@@ -18,6 +18,10 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 ```java
 // Initialize Samart API using clientcode and password.
 SmartConnect smartConnect = new SmartConnect();
+
+// PROVIDE YOUR API KEY HERE
+smartConnect.setApiKey("api_key");
+
 User user = smartConnect.generateSession("your_clientcode", "your_password");
 
 // Set token.
@@ -25,7 +29,6 @@ smartConnect.setAccessToken(user.getAccessToken());
 
 // Set userId.
 smartConnect.setUserId(user.getUserId());
-
 
 /* First you should get request_token, public_token using smartapi login and then use jwttoken smartapi call.
 Get login url. Use this url in webview to login user, after authenticating user you will get requestToken. Use the same to get accessToken. */
@@ -38,13 +41,43 @@ User user = smartConnect.generateSession("your_clientcode", "your_password");
 smartConnect.setAccessToken(user.getAccessToken());
 smartConnect.setUserId(user.getUserId());
 
-// Set session expiry callback.
-smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
-    @Override
-    public void sessionExpired() {
-        System.out.println("session expired");                    
-    }
-});
+Examples examples = new Examples();
+
+//getProfile
+examples.getProfile(smartConnect);
+
+//placeOrder
+examples.placeOrder(smartConnect);
+
+//modifyOrder
+examples.modifyOrder(smartConnect);
+
+//cancelOrder
+examples.cancelOrder(smartConnect);
+
+//getOrder
+examples.getOrder(smartConnect);
+
+//getLTP
+examples.getLTP(smartConnect);
+
+//getTrades
+examples.getTrades(smartConnect);
+
+//getRMS
+examples.getRMS(smartConnect);
+
+//getHolding
+examples.getHolding(smartConnect);
+
+//getPosition
+examples.getPosition(smartConnect);
+
+//convertPosition
+examples.convertPosition(smartConnect);
+
+//logout
+examples.logout(smartConnect);
 
 ```
 For more details, take a look at Examples.java in sample directory.
