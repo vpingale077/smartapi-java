@@ -41,13 +41,43 @@ User user = smartConnect.generateSession("your_clientcode", "your_password");
 smartConnect.setAccessToken(user.getAccessToken());
 smartConnect.setUserId(user.getUserId());
 
-// Set session expiry callback.
-smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
-    @Override
-    public void sessionExpired() {
-        System.out.println("session expired");                    
-    }
-});
+Examples examples = new Examples();
+
+//getProfile
+examples.getProfile(smartConnect);
+
+//placeOrder
+examples.placeOrder(smartConnect);
+
+//modifyOrder
+examples.modifyOrder(smartConnect);
+
+//cancelOrder
+examples.cancelOrder(smartConnect);
+
+//getOrder
+examples.getOrder(smartConnect);
+
+//getLTP
+examples.getLTP(smartConnect);
+
+//getTrades
+examples.getTrades(smartConnect);
+
+//getRMS
+examples.getRMS(smartConnect);
+
+//getHolding
+examples.getHolding(smartConnect);
+
+//getPosition
+examples.getPosition(smartConnect);
+
+//convertPosition
+examples.convertPosition(smartConnect);
+
+//logout
+examples.logout(smartConnect);
 
 ```
 For more details, take a look at Examples.java in sample directory.
