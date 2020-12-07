@@ -3,8 +3,6 @@ The official Java client for communicating with [Smart API Connect API](https://
 
 Smart API is a set of REST-like APIs that expose many capabilities required to build a complete investment and trading platform. Execute orders in real time, manage user portfolio, stream live market data (WebSockets), and more, with the simple HTTP API collection.
 
-[Angel Broking Technology Pvt Ltd](https://www.angelbroking.com/) (c) 2018. Licensed under the MIT License.
-
 ## Documentation
 - [Smart API - HTTP API documentation] (https://smartapi.angelbroking.com/docs/connect/v1/)
 - [Java library documentation](https://smartapi.angelbroking.com/docs/connect/v1/)
