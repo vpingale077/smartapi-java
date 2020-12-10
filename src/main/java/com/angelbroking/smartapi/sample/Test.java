@@ -3,6 +3,7 @@ package com.angelbroking.smartapi.sample;
 import com.angelbroking.smartapi.SmartConnect;
 import com.angelbroking.smartapi.http.SessionExpiryHook;
 import com.angelbroking.smartapi.http.exceptions.SmartAPIException;
+import com.angelbroking.smartapi.models.TokenSet;
 import com.angelbroking.smartapi.models.User;
 
 public class Test {
@@ -28,9 +29,9 @@ public class Test {
 			smartConnect.setUserId(user.getUserId());
 
 			// token re-generate testing
-			// TokenSet tokenSet = smartConnect.renewAccessToken(user.getAccessToken(),
-			// user.getRefreshToken());
-			// System.out.println("new access_token: " + tokenSet.getAccessToken());
+			TokenSet tokenSet = smartConnect.renewAccessToken(user.getAccessToken(),
+			 user.getRefreshToken());
+			 System.out.println("new access_token: " + tokenSet.getAccessToken());
 
 			Examples examples = new Examples();
 
@@ -69,6 +70,8 @@ public class Test {
 
 			System.out.println("logout");
 			examples.logout(smartConnect);
+
+			
 
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());

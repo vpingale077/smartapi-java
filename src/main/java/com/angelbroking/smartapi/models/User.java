@@ -189,4 +189,12 @@ public class User {
 		this.exchanges = exchanges;
 	}
 
+	public String getFeedToken() {
+		return feedToken;
+	}
+
+	public void setFeedToken(String feedToken) {
+		this.feedToken = feedToken;
+	}
+
 }

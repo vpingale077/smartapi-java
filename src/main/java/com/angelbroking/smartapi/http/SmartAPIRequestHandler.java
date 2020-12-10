@@ -211,7 +211,29 @@ public class SmartAPIRequestHandler {
 
 		// MAC Address
 		NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-		byte[] mac = network.getHardwareAddress();
+		byte[] mac = null;
+		if (network != null) {
+			mac = network.getHardwareAddress();
+		} else {
+			network = NetworkInterface.getByName("eth0");
+			if (network != null) {
+				mac = network.getHardwareAddress();
+			} else {
+				network = NetworkInterface.getByName("eth1");
+				if (network != null) {
+					mac = network.getHardwareAddress();
+				} else {
+					network = NetworkInterface.getByName("eth2");
+					if (network != null) {
+						mac = network.getHardwareAddress();
+					} else {
+						network = NetworkInterface.getByName("usb0");
+						mac = network.getHardwareAddress();
+					}
+				}
+			}
+
+		}
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < mac.length; i++) {
@@ -280,7 +302,29 @@ public class SmartAPIRequestHandler {
 
 			// MAC Address
 			NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-			byte[] mac = network.getHardwareAddress();
+			byte[] mac = null;
+			if (network != null) {
+				mac = network.getHardwareAddress();
+			} else {
+				network = NetworkInterface.getByName("eth0");
+				if (network != null) {
+					mac = network.getHardwareAddress();
+				} else {
+					network = NetworkInterface.getByName("eth1");
+					if (network != null) {
+						mac = network.getHardwareAddress();
+					} else {
+						network = NetworkInterface.getByName("eth2");
+						if (network != null) {
+							mac = network.getHardwareAddress();
+						} else {
+							network = NetworkInterface.getByName("usb0");
+							mac = network.getHardwareAddress();
+						}
+					}
+				}
+
+			}
 
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < mac.length; i++) {
@@ -331,7 +375,29 @@ public class SmartAPIRequestHandler {
 
 			// MAC Address
 			NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-			byte[] mac = network.getHardwareAddress();
+			byte[] mac = null;
+			if (network != null) {
+				mac = network.getHardwareAddress();
+			} else {
+				network = NetworkInterface.getByName("eth0");
+				if (network != null) {
+					mac = network.getHardwareAddress();
+				} else {
+					network = NetworkInterface.getByName("eth1");
+					if (network != null) {
+						mac = network.getHardwareAddress();
+					} else {
+						network = NetworkInterface.getByName("eth2");
+						if (network != null) {
+							mac = network.getHardwareAddress();
+						} else {
+							network = NetworkInterface.getByName("usb0");
+							mac = network.getHardwareAddress();
+						}
+					}
+				}
+
+			}
 
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < mac.length; i++) {

@@ -50,7 +50,6 @@ public class SmartAPITicker {
 	private OnDisconnect onDisconnectedListener;
 	private OnError onErrorListener;
 	private WebSocket ws;
-	private OnOrderUpdate orderUpdateListener;
 
 	public final int NseCM = 1, NseFO = 2, NseCD = 3, BseCM = 4, BseFO = 5, BseCD = 6, McxFO = 7, McxSX = 8,
 			NseIndices = 9;
@@ -79,7 +78,7 @@ public class SmartAPITicker {
 	/** Used to reconnect after the specified delay. */
 	private boolean canReconnect = true;
 
-	public SmartAPITicker(String accessToken, String feedToken) {
+	public SmartAPITicker(String clientId, String feedToken, String script) {
 
 		if (wsuri == null) {
 			getUrl();
@@ -87,6 +86,17 @@ public class SmartAPITicker {
 
 		try {
 			ws = new WebSocketFactory().createSocket(wsuri);
+			JSONObject wsJSONRequest = new JSONObject();
+			// var _req = '{"task":"cn","channel":"","token":"' + FEED_TOKEN + '","user": "'
+			// + CLIENT_CODE + '","acctid":"' + CLIENT_CODE + '"}';
+			wsJSONRequest.put("task", "cn");
+			wsJSONRequest.put("channel", "");
+			wsJSONRequest.put("token", feedToken);
+			wsJSONRequest.put("user", clientId);
+			wsJSONRequest.put("acctid", clientId);
+
+			ws.sendText(wsJSONRequest.toString());
+
 		} catch (IOException e) {
 			if (onErrorListener != null) {
 				onErrorListener.onError(e);
@@ -94,6 +104,7 @@ public class SmartAPITicker {
 			return;
 		}
 		ws.addListener(getWebsocketAdapter());
+
 		modeMap = new HashMap<>();
 	}
 
@@ -204,15 +215,6 @@ public class SmartAPITicker {
 	 */
 	public void setOnDisconnectedListener(OnDisconnect listener) {
 		onDisconnectedListener = listener;
-	}
-
-	/**
-	 * Set listener for order updates.
-	 * 
-	 * @param listener is used to listen to order updates.
-	 */
-	public void setOnOrderUpdateListener(OnOrderUpdate listener) {
-		orderUpdateListener = listener;
 	}
 
 	/**
@@ -733,12 +735,6 @@ public class SmartAPITicker {
 			}
 
 			String type = data.getString("type");
-			if (type.equals("order")) {
-				if (orderUpdateListener != null) {
-					orderUpdateListener.onOrderUpdate(getOrder(data));
-				}
-			}
-
 			if (type.equals("error")) {
 				if (onErrorListener != null) {
 					onErrorListener.onError(data.getString("data"));
