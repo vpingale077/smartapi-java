@@ -272,14 +272,12 @@ public class SmartConnect {
 			params.put("quantity", orderParams.quantity);
 		if (orderParams.price != null)
 			params.put("price", orderParams.price);
-//		if (orderParams.variety != null)
+		if (orderParams.symboltoken != null)
+			params.put("symboltoken", orderParams.symboltoken);
+
 		params.put("variety", variety);
 
-		// System.out.println("Params: " + params);
-
 		JSONObject jsonObject = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-
-		// System.out.println(jsonObject);
 		Order order = new Order();
 		order.orderId = jsonObject.getJSONObject("data").getString("orderid");
 		return order;
@@ -375,23 +373,14 @@ public class SmartConnect {
 	public List<Order> getOrderHistory(String clientId) throws SmartAPIException, IOException, JSONException {
 		try {
 			String url = routes.get("api.order.book");
-			JSONObject params = new JSONObject();
-			params.put("clientcode", clientId);
-
-			JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-//			System.out.println("orderStatusResponse: " + response.getJSONArray("data"));
-//			String jsonArrayStr = response.getJSONArray("data").toString();
+			JSONObject response = smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
 			gson = new Gson();
-//			Order order[] = gson.fromJson(jsonArrayStr, Order[].class);
-//			System.out.println("newRes: " + order);
 			List<Order> orderList = Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), Order[].class));
 			for (Iterator iterator = orderList.iterator(); iterator.hasNext();) {
 				Order order = (Order) iterator.next();
-
-				// System.out.println(order.toString());
 			}
 			System.out.println(orderList.toString());
-			return orderList;// Arrays.asList(order);
+			return orderList;
 		} catch (Exception e) {
 			System.out.println("Exception#: " + e.getMessage());
 			e.printStackTrace();
@@ -410,11 +399,12 @@ public class SmartConnect {
 	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
 	 * @throws IOException       is thrown when there is connection related error.
 	 */
-	public JSONObject getLTP(String exchange, String tradingSymbol)
+	public JSONObject getLTP(String exchange, String tradingSymbol, String symboltoken)
 			throws SmartAPIException, IOException, JSONException {
 		JSONObject params = new JSONObject();
 		params.put("exchange", exchange);
 		params.put("tradingsymbol", tradingSymbol);
+		params.put("symboltoken", symboltoken);
 		String url = routes.get("api.ltp.data");
 		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
 

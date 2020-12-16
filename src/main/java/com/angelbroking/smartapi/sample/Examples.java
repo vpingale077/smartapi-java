@@ -59,7 +59,7 @@ public class Examples {
 	/** Modify order. */
 	public void modifyOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		// Order modify request will return order model which will contain only
-		// order_id.
+
 		OrderParams orderParams = new OrderParams();
 		orderParams.quantity = 1;
 		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
@@ -70,7 +70,8 @@ public class Examples {
 		orderParams.duration = Constants.VALIDITY_DAY;
 		orderParams.price = 122.2;
 
-		Order order = smartConnect.modifyOrder("201009000000015", orderParams, Constants.VARIETY_REGULAR);
+		String orderId = "201009000000015";
+		Order order = smartConnect.modifyOrder(orderId, orderParams, Constants.VARIETY_REGULAR);
 		System.out.println("orderId: " + order.orderId);
 	}
 
@@ -100,7 +101,8 @@ public class Examples {
 	public void getLTP(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		String exchange = "BSE";
 		String tradingSymbol = "SBIN-EQ";
-		JSONObject ltpData = smartConnect.getLTP(exchange, tradingSymbol);
+		String symboltoken = "3045";
+		JSONObject ltpData = smartConnect.getLTP(exchange, tradingSymbol, symboltoken);
 		System.out.println(ltpData.toString());
 	}
 

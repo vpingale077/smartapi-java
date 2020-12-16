@@ -66,5 +66,6 @@ public class OrderParams {
 
 	public String squareoff;
 	public String stoploss;
+	public String symboltoken;
 
 }
