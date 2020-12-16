@@ -31,7 +31,7 @@ public class Test {
 			// token re-generate testing
 			TokenSet tokenSet = smartConnect.renewAccessToken(user.getAccessToken(),
 			 user.getRefreshToken());
-			 System.out.println("new access_token: " + tokenSet.getAccessToken());
+			smartConnect.setAccessToken(tokenSet.getAccessToken());
 
 			Examples examples = new Examples();
 

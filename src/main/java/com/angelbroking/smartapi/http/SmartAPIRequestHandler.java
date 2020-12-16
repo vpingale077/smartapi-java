@@ -71,11 +71,8 @@ public class SmartAPIRequestHandler {
 			throws IOException, JSONException, SmartAPIException {
 
 		Request request = createPostRequest(apiKey, url, params);
-		// System.out.println("request object: " + request.toString());
 		Response response = client.newCall(request).execute();
-		// System.out.println(response);
 		String body = response.body().string();
-		// System.out.println(body);
 		return new SmartAPIResponseHandler().handle(response, body);
 
 	}
@@ -287,7 +284,6 @@ public class SmartAPIRequestHandler {
 	public Request createPostRequest(String apiKey, String url, JSONObject params) {
 		try {
 
-			// System.out.println("started createPostRequest");
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 			RequestBody body = RequestBody.create(params.toString(), JSON);
 

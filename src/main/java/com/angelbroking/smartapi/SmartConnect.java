@@ -154,8 +154,6 @@ public class SmartConnect {
 	public User generateSession(String clientCode, String password)
 			throws SmartAPIException, JSONException, IOException {
 		smartAPIRequestHandler = new SmartAPIRequestHandler(proxy);
-		// System.out.println("clientCode:" + clientCode);
-		// System.out.println("password:" + password);
 
 		// Create JSON params object needed to be sent to api.
 		JSONObject params = new JSONObject();
@@ -164,7 +162,6 @@ public class SmartConnect {
 
 		JSONObject loginResultObject = smartAPIRequestHandler.postRequest(this.apiKey, routes.getLoginUrl(), params);
 		String jwtToken = loginResultObject.getJSONObject("data").getString("jwtToken");
-		System.out.println("jwt Token: " + jwtToken);
 		String refreshToken = loginResultObject.getJSONObject("data").getString("refreshToken");
 		String url = routes.get("api.user.profile");
 		User user = new User().parseResponse(smartAPIRequestHandler.getRequest(this.apiKey, url, jwtToken));
@@ -194,7 +191,6 @@ public class SmartConnect {
 		params.put("checksum", sha256hex);
 		String url = routes.get("api.refresh");
 		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-		// System.out.println(response);
 
 		accessToken = response.getJSONObject("data").getString("jwtToken");
 		refreshToken = response.getJSONObject("data").getString("refreshToken");
@@ -268,12 +264,14 @@ public class SmartConnect {
 			params.put("ordertype", orderParams.ordertype);
 		if (orderParams.duration != null)
 			params.put("duration", orderParams.duration);
-		if (orderParams.quantity != null)
-			params.put("quantity", orderParams.quantity);
 		if (orderParams.price != null)
 			params.put("price", orderParams.price);
 		if (orderParams.symboltoken != null)
 			params.put("symboltoken", orderParams.symboltoken);
+		if (orderParams.squareoff != null)
+			params.put("squareoff", orderParams.squareoff);
+		if (orderParams.stoploss != null)
+			params.put("stoploss", orderParams.stoploss);
 
 		params.put("variety", variety);
 
@@ -306,8 +304,8 @@ public class SmartConnect {
 			params.put("exchange", orderParams.exchange);
 		if (orderParams.tradingsymbol != null)
 			params.put("tradingsymbol", orderParams.tradingsymbol);
-		if (orderParams.transactiontype != null)
-			params.put("transactiontype", orderParams.transactiontype);
+		if (orderParams.symboltoken != null)
+			params.put("symboltoken", orderParams.symboltoken);
 		if (orderParams.quantity != null)
 			params.put("quantity", orderParams.quantity);
 		if (orderParams.price != null)
@@ -318,19 +316,11 @@ public class SmartConnect {
 			params.put("ordertype", orderParams.ordertype);
 		if (orderParams.duration != null)
 			params.put("duration", orderParams.duration);
-		if (orderParams.quantity != null)
-			params.put("quantity", orderParams.quantity);
-		if (orderParams.price != null)
-			params.put("price", orderParams.price);
-//		if (orderParams.variety != null)
+
 		params.put("variety", variety);
 		params.put("orderid", orderId);
 
-		// System.out.println("Params: " + params);
-
 		JSONObject jsonObject = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-
-		// System.out.println(jsonObject);
 		Order order = new Order();
 		order.orderId = jsonObject.getJSONObject("data").getString("orderid");
 		return order;
@@ -379,7 +369,6 @@ public class SmartConnect {
 			for (Iterator iterator = orderList.iterator(); iterator.hasNext();) {
 				Order order = (Order) iterator.next();
 			}
-			System.out.println(orderList.toString());
 			return orderList;
 		} catch (Exception e) {
 			System.out.println("Exception#: " + e.getMessage());
@@ -405,6 +394,7 @@ public class SmartConnect {
 		params.put("exchange", exchange);
 		params.put("tradingsymbol", tradingSymbol);
 		params.put("symboltoken", symboltoken);
+
 		String url = routes.get("api.ltp.data");
 		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
 
@@ -423,7 +413,6 @@ public class SmartConnect {
 	public List<Trade> getTrades() throws SmartAPIException, JSONException, IOException {
 		String url = routes.get("api.order.trade.book");
 		JSONObject response = smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
-		// System.out.println(response.toString());
 		return Arrays.asList(gson.fromJson(String.valueOf(response.get("data")), Trade[].class));
 	}
 
@@ -439,7 +428,6 @@ public class SmartConnect {
 	public JSONObject getRMS() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.data");
 		JSONObject response = smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
-		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -455,7 +443,6 @@ public class SmartConnect {
 	public JSONObject getHolding() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.holding");
 		JSONObject response = smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
-		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -471,7 +458,6 @@ public class SmartConnect {
 	public JSONObject getPosition() throws JSONException, IOException, SmartAPIException {
 		String url = routes.get("api.order.rms.position");
 		JSONObject response = smartAPIRequestHandler.getRequest(this.apiKey, url, accessToken);
-		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -487,7 +473,6 @@ public class SmartConnect {
 	public JSONObject convertPosition(JSONObject params) throws SmartAPIException, IOException, JSONException {
 		String url = routes.get("api.order.rms.position.convert");
 		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-		// System.out.println(response.toString());
 		return response.getJSONObject("data");
 	}
 
@@ -504,7 +489,7 @@ public class SmartConnect {
 		JSONObject params = new JSONObject();
 		params.put("clientcode", this.userId);
 		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
-		return response.getJSONObject("data");
+		return response;
 	}
 
 }

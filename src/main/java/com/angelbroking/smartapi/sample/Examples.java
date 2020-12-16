@@ -17,7 +17,6 @@ public class Examples {
 
 	public void getProfile(SmartConnect smartConnect) throws IOException, SmartAPIException {
 		User profile = smartConnect.getProfile();
-		System.out.println("User Profile: " + profile.getUserName());
 	}
 
 	/** Place order. */
@@ -38,8 +37,7 @@ public class Examples {
 		OrderParams orderParams = new OrderParams();
 		orderParams.variety = "NORMAL";
 		orderParams.quantity = 1;
-		orderParams.symbolToken = "3045";
-		orderParams.transactiontype = "BUY";
+		orderParams.symboltoken = "3045";
 		orderParams.exchange = Constants.EXCHANGE_NSE;
 		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
 		orderParams.tradingsymbol = "SBIN-EQ";
@@ -53,7 +51,6 @@ public class Examples {
 		// characters and only alphanumeric is allowed
 
 		Order order = smartConnect.placeOrder(orderParams, Constants.VARIETY_REGULAR);
-		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Modify order. */
@@ -64,15 +61,14 @@ public class Examples {
 		orderParams.quantity = 1;
 		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
 		orderParams.tradingsymbol = "ASHOKLEY";
+		orderParams.symboltoken = "3045";
 		orderParams.producttype = Constants.PRODUCT_DELIVERY;
 		orderParams.exchange = Constants.EXCHANGE_NSE;
-		orderParams.transactiontype = Constants.TRANSACTION_TYPE_BUY;
 		orderParams.duration = Constants.VALIDITY_DAY;
 		orderParams.price = 122.2;
 
-		String orderId = "201009000000015";
+		String orderId = "201216000755110";
 		Order order = smartConnect.modifyOrder(orderId, orderParams, Constants.VARIETY_REGULAR);
-		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Cancel an order */
@@ -81,7 +77,6 @@ public class Examples {
 		// order_id.
 		// Cancel order will return order model which will only have orderId.
 		Order order = smartConnect.cancelOrder("201009000000015", Constants.VARIETY_REGULAR);
-		System.out.println("orderId: " + order.orderId);
 	}
 
 	/** Get order details */
@@ -90,7 +85,6 @@ public class Examples {
 		for (int i = 0; i < orders.size(); i++) {
 			System.out.println(orders.get(i).orderId + " " + orders.get(i).status);
 		}
-		System.out.println("list size is: " + orders.size());
 	}
 
 	/**
@@ -99,11 +93,10 @@ public class Examples {
 	 * 50, BSE:SENSEX} or {256265, 265}
 	 */
 	public void getLTP(SmartConnect smartConnect) throws SmartAPIException, IOException {
-		String exchange = "BSE";
+		String exchange = "NSE";
 		String tradingSymbol = "SBIN-EQ";
 		String symboltoken = "3045";
 		JSONObject ltpData = smartConnect.getLTP(exchange, tradingSymbol, symboltoken);
-		System.out.println(ltpData.toString());
 	}
 
 	/** Get tradebook */
@@ -113,28 +106,24 @@ public class Examples {
 		for (int i = 0; i < trades.size(); i++) {
 			System.out.println(trades.get(i).tradingSymbol + " " + trades.size());
 		}
-		System.out.println("Trade Size: " + trades.size());
 	}
 
 	/** Get RMS */
 	public void getRMS(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		// Returns RMS.
 		JSONObject response = smartConnect.getRMS();
-		System.out.println(response);
 	}
 
 	/** Get Holdings */
 	public void getHolding(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		// Returns Holding.
 		JSONObject response = smartConnect.getHolding();
-		System.out.println(response);
 	}
 
 	/** Get Position */
 	public void getPosition(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		// Returns Position.
 		JSONObject response = smartConnect.getPosition();
-		System.out.println(response);
 	}
 
 	/** convert Position */
@@ -150,14 +139,12 @@ public class Examples {
 		requestObejct.put("type", "DAY");
 
 		JSONObject response = smartConnect.getPosition();
-		System.out.println(response);
 	}
 
 	/** Logout user. */
 	public void logout(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		/** Logout user and kill session. */
 		JSONObject jsonObject = smartConnect.logout();
-		System.out.println(jsonObject);
 	}
 
 }
