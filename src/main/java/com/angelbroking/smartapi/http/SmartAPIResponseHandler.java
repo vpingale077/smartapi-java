@@ -25,7 +25,6 @@ public class SmartAPIResponseHandler {
 	public JSONObject handle(Response response, String body) throws IOException, SmartAPIException, JSONException {
 		if (response.header("Content-Type").contains("json")) {
 			JSONObject jsonObject = new JSONObject(body);
-			System.out.println("jsonObject: " + jsonObject.toString());
 			if (jsonObject.optString("data") == null || jsonObject.optString("data") == "") {
 				if (jsonObject.has("errorcode")) {
 					throw dealWithException(jsonObject, jsonObject.getString("errorcode"));

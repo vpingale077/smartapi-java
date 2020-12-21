@@ -27,9 +27,6 @@ import com.angelbroking.smartapi.http.exceptions.SmartAPIException;
 import com.angelbroking.smartapi.models.Depth;
 import com.angelbroking.smartapi.models.Order;
 import com.angelbroking.smartapi.models.Tick;
-/**
- * Created by H1ccup on 10/09/16.
- */
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -54,8 +51,6 @@ public class SmartAPITicker {
 	public final int NseCM = 1, NseFO = 2, NseCD = 3, BseCM = 4, BseFO = 5, BseCD = 6, McxFO = 7, McxSX = 8,
 			NseIndices = 9;
 
-	private final String mSubscribe = "subscribe", mUnSubscribe = "unsubscribe", mSetMode = "mode";
-
 	public static String modeFull = "full", // Full quote inludes Quote items, market depth, OI, day high OI, day low
 											// OI, last traded time, tick timestamp.
 			modeQuote = "quote", // Quote includes last traded price, last traded quantity, average traded price,
@@ -78,24 +73,25 @@ public class SmartAPITicker {
 	/** Used to reconnect after the specified delay. */
 	private boolean canReconnect = true;
 
+	private String clientId;
+	private String feedToken;
+	private String script;
+
 	public SmartAPITicker(String clientId, String feedToken, String script) {
+
+		this.clientId = clientId;
+		this.feedToken = feedToken;
+		this.script = script;
 
 		if (wsuri == null) {
 			getUrl();
 		}
 
 		try {
-			ws = new WebSocketFactory().createSocket(wsuri);
-			JSONObject wsJSONRequest = new JSONObject();
-			// var _req = '{"task":"cn","channel":"","token":"' + FEED_TOKEN + '","user": "'
-			// + CLIENT_CODE + '","acctid":"' + CLIENT_CODE + '"}';
-			wsJSONRequest.put("task", "cn");
-			wsJSONRequest.put("channel", "");
-			wsJSONRequest.put("token", feedToken);
-			wsJSONRequest.put("user", clientId);
-			wsJSONRequest.put("acctid", clientId);
 
-			ws.sendText(wsJSONRequest.toString());
+			ws = new WebSocketFactory().createSocket(wsuri);
+
+//			
 
 		} catch (IOException e) {
 			if (onErrorListener != null) {
@@ -104,8 +100,6 @@ public class SmartAPITicker {
 			return;
 		}
 		ws.addListener(getWebsocketAdapter());
-
-		modeMap = new HashMap<>();
 	}
 
 	private TimerTask getTask() {
@@ -375,28 +369,24 @@ public class SmartAPITicker {
 	 * @param mode   the mode that needs to be set. Scroll up to see different kind
 	 *               of modes
 	 */
-	public void setMode(ArrayList<Long> tokens, String mode) {
-		JSONObject jobj = new JSONObject();
+	public void sendText() {
+
+		JSONObject wsJSONRequest = new JSONObject();
 		try {
-			// int a[] = {256265, 408065, 779521, 738561, 177665, 25601};
-			JSONArray list = new JSONArray();
-			JSONArray listMain = new JSONArray();
-			listMain.put(0, mode);
-			for (int i = 0; i < tokens.size(); i++) {
-				list.put(i, tokens.get(i));
-			}
-			listMain.put(1, list);
-			jobj.put("a", mSetMode);
-			jobj.put("v", listMain);
-			for (int i = 0; i < tokens.size(); i++) {
-				modeMap.put(tokens.get(i), mode);
-			}
+
+			wsJSONRequest = new JSONObject();
+			wsJSONRequest.put("task", "cn");
+			wsJSONRequest.put("channel", this.script);
+			wsJSONRequest.put("token", this.feedToken);
+			wsJSONRequest.put("user", this.clientId);
+			wsJSONRequest.put("acctid", this.clientId);
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
 		if (ws != null) {
-			ws.sendText(jobj.toString());
+			ws.sendText(wsJSONRequest.toString());
 		}
 	}
 
@@ -405,26 +395,26 @@ public class SmartAPITicker {
 	 * 
 	 * @param tokens is list of tokens to be subscribed for.
 	 */
-	public void subscribe(ArrayList<Long> tokens) {
-		if (ws != null) {
-			if (ws.isOpen()) {
-				createTickerJsonObject(tokens, mSubscribe);
-				ws.sendText(createTickerJsonObject(tokens, mSubscribe).toString());
-				subscribedTokens.addAll(tokens);
-				for (int i = 0; i < tokens.size(); i++) {
-					modeMap.put(tokens.get(i), modeQuote);
-				}
-			} else {
-				if (onErrorListener != null) {
-					onErrorListener.onError(new SmartAPIException("ticker is not connected", "504"));
-				}
-			}
-		} else {
-			if (onErrorListener != null) {
-				onErrorListener.onError(new SmartAPIException("ticker is null not connected", "504"));
-			}
-		}
-	}
+//	public void subscribe(ArrayList<Long> tokens) {
+//		if (ws != null) {
+//			if (ws.isOpen()) {
+//				createTickerJsonObject(tokens, mSubscribe);
+//				ws.sendText(createTickerJsonObject(tokens, mSubscribe).toString());
+//				subscribedTokens.addAll(tokens);
+//				for (int i = 0; i < tokens.size(); i++) {
+//					modeMap.put(tokens.get(i), modeQuote);
+//				}
+//			} else {
+//				if (onErrorListener != null) {
+//					onErrorListener.onError(new SmartAPIException("ticker is not connected", "504"));
+//				}
+//			}
+//		} else {
+//			if (onErrorListener != null) {
+//				onErrorListener.onError(new SmartAPIException("ticker is null not connected", "504"));
+//			}
+//		}
+//	}
 
 	/** Create a JSONObject to send message to server. */
 	private JSONObject createTickerJsonObject(ArrayList<Long> tokens, String action) {
@@ -440,23 +430,6 @@ public class SmartAPITicker {
 		}
 
 		return jobj;
-	}
-
-	/**
-	 * Unsubscribes ticks for list of tokens.
-	 * 
-	 * @param tokens is the list of tokens that needs to be unsubscribed.
-	 */
-	public void unsubscribe(ArrayList<Long> tokens) {
-		if (ws != null) {
-			if (ws.isOpen()) {
-				ws.sendText(createTickerJsonObject(tokens, mUnSubscribe).toString());
-				subscribedTokens.removeAll(tokens);
-				for (int i = 0; i < tokens.size(); i++) {
-					modeMap.remove(tokens.get(i));
-				}
-			}
-		}
 	}
 
 	/*
@@ -682,26 +655,6 @@ public class SmartAPITicker {
 		setOnConnectedListener(new OnConnect() {
 			@Override
 			public void onConnected() {
-				if (subscribedTokens.size() > 0) {
-					// take a backup of mode map as it will be overriden to modeQuote after
-					// subscribe
-					Map<Long, String> backupModeMap = new HashMap<>();
-					backupModeMap.putAll(modeMap);
-					ArrayList<Long> tokens = new ArrayList<>();
-					tokens.addAll(subscribedTokens);
-					subscribe(tokens);
-
-					Map<String, ArrayList<Long>> modes = new HashMap<>();
-					for (Map.Entry<Long, String> item : backupModeMap.entrySet()) {
-						if (!modes.containsKey(item.getValue())) {
-							modes.put(item.getValue(), new ArrayList<Long>());
-						}
-						modes.get(item.getValue()).add(item.getKey());
-					}
-					for (Map.Entry<String, ArrayList<Long>> modeArrayItem : modes.entrySet()) {
-						setMode(modeArrayItem.getValue(), modeArrayItem.getKey());
-					}
-				}
 				lastPongAt = 0;
 				count = 0;
 				nextReconnectInterval = 0;

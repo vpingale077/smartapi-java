@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -205,38 +206,33 @@ public class SmartAPIRequestHandler {
 		URL urlName = new URL("http://bot.whatismyipaddress.com");
 		BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
 		String clientPublicIP = sc.readLine().trim();
-
+		String macAddress = null;
+		
 		// MAC Address
-		NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-		byte[] mac = null;
-		if (network != null) {
-			mac = network.getHardwareAddress();
-		} else {
-			network = NetworkInterface.getByName("eth0");
-			if (network != null) {
-				mac = network.getHardwareAddress();
-			} else {
-				network = NetworkInterface.getByName("eth1");
-				if (network != null) {
-					mac = network.getHardwareAddress();
-				} else {
-					network = NetworkInterface.getByName("eth2");
-					if (network != null) {
-						mac = network.getHardwareAddress();
-					} else {
-						network = NetworkInterface.getByName("usb0");
-						mac = network.getHardwareAddress();
-					}
+		// get all network interfaces of the current system
+		Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
+		// iterate over all interfaces
+		while (networkInterface.hasMoreElements()) {
+			// get an interface
+			NetworkInterface network = networkInterface.nextElement();
+			// get its hardware or mac address
+			byte[] macAddressBytes = network.getHardwareAddress();
+			if (macAddressBytes != null) {
+				// initialize a string builder to hold mac address
+				StringBuilder macAddressStr = new StringBuilder();
+				// iterate over the bytes of mac address
+				for (int i = 0; i < macAddressBytes.length; i++) {
+					// convert byte to string in hexadecimal form
+					macAddressStr.append(
+							String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
+				}
+				
+				macAddress = macAddressStr.toString();
+				if(macAddress != null) {
+					break;
 				}
 			}
-
 		}
-
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mac.length; i++) {
-			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-		}
-		String macAddress = sb.toString();
 
 		String privateKey = apiKey;
 		String accept = "application/json";
@@ -296,37 +292,32 @@ public class SmartAPIRequestHandler {
 			BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
 			String clientPublicIP = sc.readLine().trim();
 
+			String macAddress = null;
 			// MAC Address
-			NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-			byte[] mac = null;
-			if (network != null) {
-				mac = network.getHardwareAddress();
-			} else {
-				network = NetworkInterface.getByName("eth0");
-				if (network != null) {
-					mac = network.getHardwareAddress();
-				} else {
-					network = NetworkInterface.getByName("eth1");
-					if (network != null) {
-						mac = network.getHardwareAddress();
-					} else {
-						network = NetworkInterface.getByName("eth2");
-						if (network != null) {
-							mac = network.getHardwareAddress();
-						} else {
-							network = NetworkInterface.getByName("usb0");
-							mac = network.getHardwareAddress();
-						}
+			// get all network interfaces of the current system
+			Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
+			// iterate over all interfaces
+			while (networkInterface.hasMoreElements()) {
+				// get an interface
+				NetworkInterface network = networkInterface.nextElement();
+				// get its hardware or mac address
+				byte[] macAddressBytes = network.getHardwareAddress();
+				if (macAddressBytes != null) {
+					// initialize a string builder to hold mac address
+					StringBuilder macAddressStr = new StringBuilder();
+					// iterate over the bytes of mac address
+					for (int i = 0; i < macAddressBytes.length; i++) {
+						// convert byte to string in hexadecimal form
+						macAddressStr.append(
+								String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
+					}
+					
+					macAddress = macAddressStr.toString();
+					if(macAddress != null) {
+						break;
 					}
 				}
-
 			}
-
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < mac.length; i++) {
-				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-			}
-			String macAddress = sb.toString();
 
 			String privateKey = apiKey;
 			String accept = "application/json";
@@ -368,38 +359,32 @@ public class SmartAPIRequestHandler {
 			URL urlName = new URL("https://bot.whatismyipaddress.com");
 			BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
 			String clientPublicIP = sc.readLine().trim();
-
+			String macAddress = null;
 			// MAC Address
-			NetworkInterface network = NetworkInterface.getByInetAddress(localHost);
-			byte[] mac = null;
-			if (network != null) {
-				mac = network.getHardwareAddress();
-			} else {
-				network = NetworkInterface.getByName("eth0");
-				if (network != null) {
-					mac = network.getHardwareAddress();
-				} else {
-					network = NetworkInterface.getByName("eth1");
-					if (network != null) {
-						mac = network.getHardwareAddress();
-					} else {
-						network = NetworkInterface.getByName("eth2");
-						if (network != null) {
-							mac = network.getHardwareAddress();
-						} else {
-							network = NetworkInterface.getByName("usb0");
-							mac = network.getHardwareAddress();
-						}
+			// get all network interfaces of the current system
+			Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
+			// iterate over all interfaces
+			while (networkInterface.hasMoreElements()) {
+				// get an interface
+				NetworkInterface network = networkInterface.nextElement();
+				// get its hardware or mac address
+				byte[] macAddressBytes = network.getHardwareAddress();
+				if (macAddressBytes != null) {
+					// initialize a string builder to hold mac address
+					StringBuilder macAddressStr = new StringBuilder();
+					// iterate over the bytes of mac address
+					for (int i = 0; i < macAddressBytes.length; i++) {
+						// convert byte to string in hexadecimal form
+						macAddressStr.append(
+								String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
+					}
+					
+					macAddress = macAddressStr.toString();
+					if(macAddress != null) {
+						break;
 					}
 				}
-
 			}
-
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < mac.length; i++) {
-				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-			}
-			String macAddress = sb.toString();
 
 			String privateKey = apiKey;
 			String accept = "application/json";
