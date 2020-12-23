@@ -17,8 +17,8 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 	// Initialize Samart API using clientcode and password.
 	SmartConnect smartConnect = new SmartConnect();
 	
-	// Provide you api key here
-	smartConnect.setApiKey("smartapi_key");
+	// Provide your api key here
+	smartConnect.setApiKey("<api_key>");
 	
 	// Set session expiry callback.
 	smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
@@ -163,7 +163,7 @@ For more details, take a look at Examples.java in sample directory.
 	// SmartAPITicker
 	String clientId = "<clientID>";
 			
-	// feedTokne - User user = smartConnect.generateSession(<clientId>, <password>);
+	// feedToken - User user = smartConnect.generateSession(<clientId>, <password>);
 	String feedToken = user.getFeedToken();
 	String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
 			
