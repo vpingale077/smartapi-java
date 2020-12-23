@@ -1,9 +1,7 @@
 package com.angelbroking.smartapi.ticker;
 
-import java.util.ArrayList;
-
-import com.angelbroking.smartapi.models.Tick;
+import org.json.JSONArray;
 
 public interface OnTicks {
-	void onTicks(ArrayList<Tick> ticks);
+	void onTicks(JSONArray ticks);
 }

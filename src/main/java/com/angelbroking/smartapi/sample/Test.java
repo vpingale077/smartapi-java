@@ -24,7 +24,6 @@ public class Test {
 			});
 
 			User user = smartConnect.generateSession("S212741", "pass@123");
-			System.out.println(user.toString());
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
 
@@ -73,11 +72,17 @@ public class Test {
 			System.out.println("logout");
 			examples.logout(smartConnect);
 
+			// SmartAPITicker
+			String clientId = "S212741";
+			String feedToken = user.getFeedToken();
+			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
+			
+			examples.tickerUsage(clientId, feedToken, strWatchListScript);
+
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
 
 	}
-
 }

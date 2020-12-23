@@ -1,38 +1,27 @@
 package com.angelbroking.smartapi.ticker;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.zip.DataFormatException;
+import java.util.zip.InflaterOutputStream;
+
+import javax.net.ssl.SSLContext;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.angelbroking.smartapi.Routes;
 import com.angelbroking.smartapi.http.exceptions.SmartAPIException;
-import com.angelbroking.smartapi.models.Depth;
-import com.angelbroking.smartapi.models.Order;
-import com.angelbroking.smartapi.models.Tick;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.angelbroking.smartapi.utils.NaiveSSLContext;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -41,25 +30,15 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 
 public class SmartAPITicker {
 
-	private String wsuri;
+	private Routes routes = new Routes();
+	private final String wsuri = routes.getWsuri();;
 	private OnTicks onTickerArrivalListener;
 	private OnConnect onConnectedListener;
 	private OnDisconnect onDisconnectedListener;
 	private OnError onErrorListener;
 	private WebSocket ws;
 
-	public final int NseCM = 1, NseFO = 2, NseCD = 3, BseCM = 4, BseFO = 5, BseCD = 6, McxFO = 7, McxSX = 8,
-			NseIndices = 9;
-
-	public static String modeFull = "full", // Full quote inludes Quote items, market depth, OI, day high OI, day low
-											// OI, last traded time, tick timestamp.
-			modeQuote = "quote", // Quote includes last traded price, last traded quantity, average traded price,
-									// volume, total bid(buy quantity), total ask(sell quantity), open, high, low,
-									// close.
-			modeLTP = "ltp"; // Only LTP.
-
 	private long lastPongAt = 0;
-	private Set<Long> subscribedTokens = new HashSet<>();
 	private int maxRetries = 10;
 	private int count = 0;
 	private Timer timer = null;
@@ -68,40 +47,43 @@ public class SmartAPITicker {
 	private final int pongCheckInterval = 2500;
 	private int nextReconnectInterval = 0;
 	private int maxRetryInterval = 30000;
-	private Map<Long, String> modeMap;
 	private Timer canReconnectTimer = null;
 	/** Used to reconnect after the specified delay. */
 	private boolean canReconnect = true;
-
 	private String clientId;
 	private String feedToken;
-	private String script;
 
-	public SmartAPITicker(String clientId, String feedToken, String script) {
+	/**
+	 * Initialize SmartAPITicker.
+	 */
+	public SmartAPITicker(String clientId, String feedToken) {
 
 		this.clientId = clientId;
 		this.feedToken = feedToken;
-		this.script = script;
-
-		if (wsuri == null) {
-			getUrl();
-		}
 
 		try {
 
-			ws = new WebSocketFactory().createSocket(wsuri);
-
-//			
+			SSLContext context = NaiveSSLContext.getInstance("TLS");
+			ws = new WebSocketFactory().setSSLContext(context).setVerifyHostname(false).createSocket(wsuri);
 
 		} catch (IOException e) {
 			if (onErrorListener != null) {
 				onErrorListener.onError(e);
 			}
 			return;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
 		}
+
 		ws.addListener(getWebsocketAdapter());
 	}
 
+	/**
+	 * Returns task which performs check every second for reconnection.
+	 * 
+	 * @return TimerTask returns timer task which will be invoked after user defined
+	 *         interval and tries reconnect.
+	 */
 	private TimerTask getTask() {
 		TimerTask checkForRestartTask = new TimerTask() {
 			@Override
@@ -119,6 +101,10 @@ public class SmartAPITicker {
 		return checkForRestartTask;
 	}
 
+	/**
+	 * Performs reconnection after a particular interval if count is less than
+	 * maximum retries.
+	 */
 	public void doReconnect() {
 		if (!tryReconnection)
 			return;
@@ -135,7 +121,7 @@ public class SmartAPITicker {
 		if (count <= maxRetries) {
 			if (canReconnect) {
 				count++;
-				reconnect(new ArrayList<>(subscribedTokens));
+				reconnect();
 				canReconnect = false;
 				canReconnectTimer = new Timer();
 				canReconnectTimer.schedule(new TimerTask() {
@@ -146,6 +132,7 @@ public class SmartAPITicker {
 				}, nextReconnectInterval);
 			}
 		} else if (count > maxRetries) {
+			// if number of tries exceeds maximum number of retries then stop timer.
 			if (timer != null) {
 				timer.cancel();
 				timer = null;
@@ -153,14 +140,34 @@ public class SmartAPITicker {
 		}
 	}
 
+	/**
+	 * Set tryReconnection, to instruct SmartAPITicker that it has to reconnect, if
+	 * com.angelbroking.smartapi.ticker is disconnected.
+	 * 
+	 * @param retry will denote whether reconnection should be tried or not.
+	 */
 	public void setTryReconnection(boolean retry) {
 		tryReconnection = retry;
 	}
 
+	/**
+	 * Set error listener.
+	 * 
+	 * @param listener of type OnError which listens to all the type of errors that
+	 *                 may arise in SmartAPITicker class.
+	 */
 	public void setOnErrorListener(OnError listener) {
 		onErrorListener = listener;
 	}
 
+	/**
+	 * Set max number of retries for reconnection, for infinite retries set value as
+	 * -1.
+	 * 
+	 * @param maxRetries denotes maximum number of retries that the
+	 *                   com.angelbroking.smartapi.ticker can perform.
+	 * @throws SmartAPIException when maximum retries is less than 0.
+	 */
 	public void setMaximumRetries(int maxRetries) throws SmartAPIException {
 		if (maxRetries > 0) {
 			this.maxRetries = maxRetries;
@@ -177,11 +184,6 @@ public class SmartAPITicker {
 		} else {
 			throw new SmartAPIException("Maximum retry interval can't be less than 0");
 		}
-	}
-
-	/** get url for websocket connection. */
-	private void getUrl() {
-		wsuri = new Routes().getWsuri();
 	}
 
 	/**
@@ -216,7 +218,6 @@ public class SmartAPITicker {
 	 */
 	public void connect() {
 		try {
-			System.out.println("in connect");
 			ws.setPingInterval(pingInterval);
 			ws.connect();
 		} catch (WebSocketException e) {
@@ -261,8 +262,16 @@ public class SmartAPITicker {
 			}
 
 			@Override
-			public void onTextMessage(WebSocket websocket, String message) {
-				parseTextMessage(message);
+			public void onTextMessage(WebSocket websocket, String message) throws IOException, DataFormatException {
+				byte[] decoded = Base64.getDecoder().decode(message);
+				byte[] result = decompress(decoded);
+				String str = new String(result, StandardCharsets.UTF_8);
+
+				JSONArray tickerData = new JSONArray(str);
+
+				if (onTickerArrivalListener != null) {
+					onTickerArrivalListener.onTicks(tickerData);
+				}
 			}
 
 			@Override
@@ -274,12 +283,6 @@ public class SmartAPITicker {
 					if (onErrorListener != null) {
 						onErrorListener.onError(e);
 					}
-				}
-
-				ArrayList<Tick> tickerData = parseBinary(binary);
-
-				if (onTickerArrivalListener != null) {
-					onTickerArrivalListener.onTicks(tickerData);
 				}
 			}
 
@@ -337,8 +340,6 @@ public class SmartAPITicker {
 		}
 		if (ws != null && ws.isOpen()) {
 			ws.disconnect();
-			subscribedTokens = new HashSet<>();
-			modeMap.clear();
 		}
 	}
 
@@ -363,293 +364,8 @@ public class SmartAPITicker {
 		return false;
 	}
 
-	/**
-	 * Setting different modes for an arraylist of tokens.
-	 * 
-	 * @param tokens an arraylist of tokens
-	 * @param mode   the mode that needs to be set. Scroll up to see different kind
-	 *               of modes
-	 */
-	public void sendText() {
-
-		JSONObject wsJSONRequest = new JSONObject();
-		JSONObject wsJSONRequest2 = new JSONObject();
-		try {
-
-			wsJSONRequest2.put("task", "cn");
-			wsJSONRequest2.put("channel", "");
-			wsJSONRequest2.put("token", this.feedToken);
-			wsJSONRequest2.put("user", this.clientId);
-			wsJSONRequest2.put("acctid", this.clientId);
-
-			wsJSONRequest = new JSONObject();
-			wsJSONRequest.put("task", "cn");
-			wsJSONRequest.put("channel", this.script);
-			wsJSONRequest.put("token", this.feedToken);
-			wsJSONRequest.put("user", this.clientId);
-			wsJSONRequest.put("acctid", this.clientId);
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		if (ws != null) {
-
-			ws.sendText(wsJSONRequest2.toString());
-			ws.sendText(wsJSONRequest.toString());
-		}
-	}
-
-	/**
-	 * Subscribes for list of tokens.
-	 * 
-	 * @param tokens is list of tokens to be subscribed for.
-	 */
-//	public void subscribe(ArrayList<Long> tokens) {
-//		if (ws != null) {
-//			if (ws.isOpen()) {
-//				createTickerJsonObject(tokens, mSubscribe);
-//				ws.sendText(createTickerJsonObject(tokens, mSubscribe).toString());
-//				subscribedTokens.addAll(tokens);
-//				for (int i = 0; i < tokens.size(); i++) {
-//					modeMap.put(tokens.get(i), modeQuote);
-//				}
-//			} else {
-//				if (onErrorListener != null) {
-//					onErrorListener.onError(new SmartAPIException("ticker is not connected", "504"));
-//				}
-//			}
-//		} else {
-//			if (onErrorListener != null) {
-//				onErrorListener.onError(new SmartAPIException("ticker is null not connected", "504"));
-//			}
-//		}
-//	}
-
-	/** Create a JSONObject to send message to server. */
-	private JSONObject createTickerJsonObject(ArrayList<Long> tokens, String action) {
-		JSONObject jobj = new JSONObject();
-		try {
-			JSONArray list = new JSONArray();
-			for (int i = 0; i < tokens.size(); i++) {
-				list.put(i, tokens.get(i));
-			}
-			jobj.put("v", list);
-			jobj.put("a", action);
-		} catch (JSONException e) {
-		}
-
-		return jobj;
-	}
-
-	/*
-	 * This method parses binary data got from kite server to get ticks for each
-	 * token subscribed. we have to keep a main Array List which is global and keep
-	 * deleting element in the list and add new data element in that place and call
-	 * notify data set changed.
-	 * 
-	 * @return List of parsed ticks.
-	 */
-	private ArrayList<Tick> parseBinary(byte[] binaryPackets) {
-		ArrayList<Tick> ticks = new ArrayList<Tick>();
-		ArrayList<byte[]> packets = splitPackets(binaryPackets);
-		for (int i = 0; i < packets.size(); i++) {
-			byte[] bin = packets.get(i);
-			byte[] t = Arrays.copyOfRange(bin, 0, 4);
-			int x = ByteBuffer.wrap(t).getInt();
-
-			// int token = x >> 8;
-			int segment = x & 0xff;
-
-			int dec1 = (segment == NseCD) ? 10000000 : 100;
-
-			if (bin.length == 8) {
-				Tick tick = getLtpQuote(bin, x, dec1);
-				ticks.add(tick);
-			} else if (bin.length == 28 || bin.length == 32) {
-				Tick tick = getIndeciesData(bin, x);
-				ticks.add(tick);
-			} else if (bin.length == 44) {
-				Tick tick = getQuoteData(bin, x, dec1);
-				ticks.add(tick);
-			} else if (bin.length == 184) {
-				Tick tick = getQuoteData(bin, x, dec1);
-				tick.setMode(modeFull);
-				ticks.add(getFullData(bin, dec1, tick));
-			}
-		}
-		return ticks;
-	}
-
-	/**
-	 * Parses NSE indices data.
-	 * 
-	 * @return Tick is the parsed index data.
-	 */
-	private Tick getIndeciesData(byte[] bin, int x) {
-		int dec = 100;
-		Tick tick = new Tick();
-		tick.setMode(modeFull);
-		tick.setTradable(false);
-		tick.setInstrumentToken(x);
-		tick.setLastTradedPrice(convertToDouble(getBytes(bin, 4, 8)) / dec);
-		tick.setHighPrice(convertToDouble(getBytes(bin, 8, 12)) / dec);
-		tick.setLowPrice(convertToDouble(getBytes(bin, 12, 16)) / dec);
-		tick.setOpenPrice(convertToDouble(getBytes(bin, 16, 20)) / dec);
-		tick.setClosePrice(convertToDouble(getBytes(bin, 20, 24)) / dec);
-		tick.setNetPriceChangeFromClosingPrice(convertToDouble(getBytes(bin, 24, 28)) / dec);
-		if (bin.length > 28) {
-			long tickTimeStamp = convertToLong(getBytes(bin, 28, 32)) * 1000;
-			if (isValidDate(tickTimeStamp)) {
-				tick.setTickTimestamp(new Date(tickTimeStamp));
-			} else {
-				tick.setTickTimestamp(null);
-			}
-		}
-		return tick;
-	}
-
-	/** Parses LTP data. */
-	private Tick getLtpQuote(byte[] bin, int x, int dec1) {
-		Tick tick1 = new Tick();
-		tick1.setMode(modeLTP);
-		tick1.setTradable(true);
-		tick1.setInstrumentToken(x);
-		tick1.setLastTradedPrice(convertToDouble(getBytes(bin, 4, 8)) / dec1);
-		return tick1;
-	}
-
-	/**
-	 * Get quote data (last traded price, last traded quantity, average traded
-	 * price, volume, total bid(buy quantity), total ask(sell quantity), open, high,
-	 * low, close.)
-	 */
-	private Tick getQuoteData(byte[] bin, int x, int dec1) {
-		Tick tick2 = new Tick();
-		tick2.setMode(modeQuote);
-		tick2.setInstrumentToken(x);
-		double lastTradedPrice = convertToDouble(getBytes(bin, 4, 8)) / dec1;
-		tick2.setLastTradedPrice(lastTradedPrice);
-		tick2.setLastTradedQuantity(convertToDouble(getBytes(bin, 8, 12)));
-		tick2.setAverageTradePrice(convertToDouble(getBytes(bin, 12, 16)) / dec1);
-		tick2.setVolumeTradedToday(convertToDouble(getBytes(bin, 16, 20)));
-		tick2.setTotalBuyQuantity(convertToDouble(getBytes(bin, 20, 24)));
-		tick2.setTotalSellQuantity(convertToDouble(getBytes(bin, 24, 28)));
-		tick2.setOpenPrice(convertToDouble(getBytes(bin, 28, 32)) / dec1);
-		tick2.setHighPrice(convertToDouble(getBytes(bin, 32, 36)) / dec1);
-		tick2.setLowPrice(convertToDouble(getBytes(bin, 36, 40)) / dec1);
-		double closePrice = convertToDouble(getBytes(bin, 40, 44)) / dec1;
-		tick2.setClosePrice(closePrice);
-		setChangeForTick(tick2, lastTradedPrice, closePrice);
-		return tick2;
-	}
-
-	private void setChangeForTick(Tick tick, double lastTradedPrice, double closePrice) {
-		if (closePrice != 0)
-			tick.setNetPriceChangeFromClosingPrice((lastTradedPrice - closePrice) * 100 / closePrice);
-		else
-			tick.setNetPriceChangeFromClosingPrice(0);
-
-	}
-
-	/** Parses full mode data. */
-	private Tick getFullData(byte[] bin, int dec, Tick tick) {
-		long lastTradedtime = convertToLong(getBytes(bin, 44, 48)) * 1000;
-		if (isValidDate(lastTradedtime)) {
-			tick.setLastTradedTime(new Date(lastTradedtime));
-		} else {
-			tick.setLastTradedTime(null);
-		}
-		tick.setOi(convertToDouble(getBytes(bin, 48, 52)));
-		tick.setOpenInterestDayHigh(convertToDouble(getBytes(bin, 52, 56)));
-		tick.setOpenInterestDayLow(convertToDouble(getBytes(bin, 56, 60)));
-		long tickTimeStamp = convertToLong(getBytes(bin, 60, 64)) * 1000;
-		if (isValidDate(tickTimeStamp)) {
-			tick.setTickTimestamp(new Date(tickTimeStamp));
-		} else {
-			tick.setTickTimestamp(null);
-		}
-		tick.setMarketDepth(getDepthData(bin, dec, 64, 184));
-		return tick;
-	}
-
-	/** Reads all bytes and returns map of depth values for offer and bid */
-	private Map<String, ArrayList<Depth>> getDepthData(byte[] bin, int dec, int start, int end) {
-		byte[] depthBytes = getBytes(bin, start, end);
-		int s = 0;
-		ArrayList<Depth> buy = new ArrayList<Depth>();
-		ArrayList<Depth> sell = new ArrayList<Depth>();
-		for (int k = 0; k < 10; k++) {
-			s = k * 12;
-			Depth depth = new Depth();
-			depth.setQuantity((int) convertToDouble(getBytes(depthBytes, s, s + 4)));
-			depth.setPrice(convertToDouble(getBytes(depthBytes, s + 4, s + 8)) / dec);
-			depth.setOrders((int) convertToDouble(getBytes(depthBytes, s + 8, s + 10)));
-
-			if (k < 5) {
-				buy.add(depth);
-			} else {
-				sell.add(depth);
-			}
-		}
-		Map<String, ArrayList<Depth>> depthMap = new HashMap<String, ArrayList<Depth>>();
-		depthMap.put("buy", buy);
-		depthMap.put("sell", sell);
-		return depthMap;
-	}
-
-	/**
-	 * Each byte stream contains many packets. This method reads first two bits and
-	 * calculates number of packets in the byte stream and split it.
-	 */
-	private ArrayList<byte[]> splitPackets(byte[] bin) {
-
-		ArrayList<byte[]> packets = new ArrayList<byte[]>();
-		int noOfPackets = getLengthFromByteArray(getBytes(bin, 0, 2)); // in.read(bin, 0, 2);
-		int j = 2;
-
-		for (int i = 0; i < noOfPackets; i++) {
-			int sizeOfPacket = getLengthFromByteArray(getBytes(bin, j, j + 2));// in.read(bin, j, j+2);
-			byte[] packet = Arrays.copyOfRange(bin, j + 2, j + 2 + sizeOfPacket);
-			packets.add(packet);
-			j = j + 2 + sizeOfPacket;
-		}
-		return packets;
-	}
-
-	/** Reads values of specified position in byte array. */
-	private byte[] getBytes(byte[] bin, int start, int end) {
-		return Arrays.copyOfRange(bin, start, end);
-	}
-
-	/** Convert binary data to double datatype */
-	private double convertToDouble(byte[] bin) {
-		ByteBuffer bb = ByteBuffer.wrap(bin);
-		bb.order(ByteOrder.BIG_ENDIAN);
-		if (bin.length < 4)
-			return bb.getShort();
-		else if (bin.length < 8)
-			return bb.getInt();
-		else
-			return bb.getDouble();
-	}
-
-	/* Convert binary data to long datatype */
-	private long convertToLong(byte[] bin) {
-		ByteBuffer bb = ByteBuffer.wrap(bin);
-		bb.order(ByteOrder.BIG_ENDIAN);
-		return bb.getInt();
-	}
-
-	/** Returns length of packet by reading byte array values. */
-	private int getLengthFromByteArray(byte[] bin) {
-		ByteBuffer bb = ByteBuffer.wrap(bin);
-		bb.order(ByteOrder.BIG_ENDIAN);
-		return bb.getShort();
-	}
-
-	/** Disconnects and reconnects com.zerodhatech.ticker. */
-	private void reconnect(final ArrayList<Long> tokens) {
+	/** Disconnects and reconnects */
+	private void reconnect() {
 		nonUserDisconnect();
 		try {
 			ws = new WebSocketFactory().createSocket(wsuri);
@@ -673,59 +389,51 @@ public class SmartAPITicker {
 		});
 	}
 
-	private boolean isValidDate(long date) {
-		if (date <= 0) {
-			return false;
-		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setLenient(false);
-		calendar.setTimeInMillis(date);
-		try {
-			calendar.getTime();
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+	/**
+	 * Subscribes script.
+	 */
+	public void subscribe(String script) {
+		if (ws != null) {
+			if (ws.isOpen()) {
 
-	/** Parses incoming text message. */
-	private void parseTextMessage(String message) {
-		JSONObject data;
-		try {
-			data = new JSONObject(message);
-			if (!data.has("type")) {
-				return;
-			}
+				// Send a text frame.
+				JSONObject wsCNJSONRequest = new JSONObject();
+				wsCNJSONRequest.put("task", "cn");
+				wsCNJSONRequest.put("channel", "");
+				wsCNJSONRequest.put("token", this.feedToken);
+				wsCNJSONRequest.put("user", this.clientId);
+				wsCNJSONRequest.put("acctid", this.clientId);
 
-			String type = data.getString("type");
-			if (type.equals("error")) {
+				ws.sendText(wsCNJSONRequest.toString());
+
+				JSONObject wsMWJSONRequest = new JSONObject();
+				wsMWJSONRequest.put("task", "mw");
+				wsMWJSONRequest.put("channel", script);
+				wsMWJSONRequest.put("token", this.feedToken);
+				wsMWJSONRequest.put("user", this.clientId);
+				wsMWJSONRequest.put("acctid", this.clientId);
+
+				ws.sendText(wsMWJSONRequest.toString());
+
+			} else {
 				if (onErrorListener != null) {
-					onErrorListener.onError(data.getString("data"));
+					onErrorListener.onError(new SmartAPIException("ticker is not connected", "504"));
 				}
 			}
-
-		} catch (JSONException e) {
-			e.printStackTrace();
+		} else {
+			if (onErrorListener != null) {
+				onErrorListener.onError(new SmartAPIException("ticker is null not connected", "504"));
+			}
 		}
 	}
 
-	public Order getOrder(JSONObject data) {
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+	public static byte[] decompress(byte[] compressedTxt) throws IOException {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try (OutputStream ios = new InflaterOutputStream(os)) {
+			ios.write(compressedTxt);
+		}
 
-			@Override
-			public Date deserialize(JsonElement jsonElement, Type type,
-					JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-				try {
-					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					return format.parse(jsonElement.getAsString());
-				} catch (ParseException e) {
-					return null;
-				}
-			}
-		});
-		Gson gson = gsonBuilder.setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		return gson.fromJson(String.valueOf(data.get("data")), Order.class);
+		return os.toByteArray();
 	}
 
 }

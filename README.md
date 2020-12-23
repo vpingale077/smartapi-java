@@ -14,68 +14,219 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 
 ## API usage
 ```java
-// Initialize Samart API using clientcode and password.
-SmartConnect smartConnect = new SmartConnect();
+	// Initialize Samart API using clientcode and password.
+	SmartConnect smartConnect = new SmartConnect();
+	
+	// Provide you api key here
+	smartConnect.setApiKey("smartapi_key");
+	
+	// Set session expiry callback.
+	smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
+	@Override
+	public void sessionExpired() {
+		System.out.println("session expired");
+	}
+	});
+	
+	User user = smartConnect.generateSession("S212741", "pass@123");
+	System.out.println(user.toString());
+	smartConnect.setAccessToken(user.getAccessToken());
+	smartConnect.setUserId(user.getUserId());
+	
+	// token re-generate
+	
+	TokenSet tokenSet = smartConnect.renewAccessToken(user.getAccessToken(),
+	user.getRefreshToken());
+	smartConnect.setAccessToken(tokenSet.getAccessToken());
 
-// PROVIDE YOUR API KEY HERE
-smartConnect.setApiKey("api_key");
+	/** Place order. */
+	public void placeOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
 
-User user = smartConnect.generateSession("your_clientcode", "your_password");
+		OrderParams orderParams = new OrderParams();
+		orderParams.variety = "NORMAL";
+		orderParams.quantity = 1;
+		orderParams.symboltoken = "3045";
+		orderParams.exchange = Constants.EXCHANGE_NSE;
+		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
+		orderParams.tradingsymbol = "SBIN-EQ";
+		orderParams.producttype = Constants.PRODUCT_INTRADAY;
+		orderParams.duration = Constants.VALIDITY_DAY;
+		orderParams.transactiontype = Constants.TRANSACTION_TYPE_BUY;
+		orderParams.price = 122.2;
+		orderParams.squareoff = "0";
+		orderParams.stoploss = "0";
 
-// Set token.
-smartConnect.setAccessToken(user.getAccessToken());
+		Order order = smartConnect.placeOrder(orderParams, Constants.VARIETY_REGULAR);
+	}
 
-// Set userId.
-smartConnect.setUserId(user.getUserId());
+	/** Modify order. */
+	public void modifyOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Order modify request will return order model which will contain only
 
-/* First you should get request_token, public_token using smartapi login and then use jwttoken smartapi call.
-Get login url. Use this url in webview to login user, after authenticating user you will get requestToken. Use the same to get accessToken. */
-String url = smartConnect.getLoginUrl();
+		OrderParams orderParams = new OrderParams();
+		orderParams.quantity = 1;
+		orderParams.ordertype = Constants.ORDER_TYPE_LIMIT;
+		orderParams.tradingsymbol = "ASHOKLEY";
+		orderParams.symboltoken = "3045";
+		orderParams.producttype = Constants.PRODUCT_DELIVERY;
+		orderParams.exchange = Constants.EXCHANGE_NSE;
+		orderParams.duration = Constants.VALIDITY_DAY;
+		orderParams.price = 122.2;
 
-// Get accessToken as follows,
-User user = smartConnect.generateSession("your_clientcode", "your_password");
+		String orderId = "201216000755110";
+		Order order = smartConnect.modifyOrder(orderId, orderParams, Constants.VARIETY_REGULAR);
+	}
 
-// Set request token and public token which are obtained from login process.
-smartConnect.setAccessToken(user.getAccessToken());
-smartConnect.setUserId(user.getUserId());
+	/** Cancel an order */
+	public void cancelOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Order modify request will return order model which will contain only
+		// order_id.
+		// Cancel order will return order model which will only have orderId.
+		Order order = smartConnect.cancelOrder("201009000000015", Constants.VARIETY_REGULAR);
+	}
 
-Examples examples = new Examples();
+	/** Get order details */
+	public void getOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		List<Order> orders = smartConnect.getOrderHistory(smartConnect.getUserId());
+		for (int i = 0; i < orders.size(); i++) {
+			System.out.println(orders.get(i).orderId + " " + orders.get(i).status);
+		}
+	}
 
-//getProfile
-examples.getProfile(smartConnect);
+	/**
+	 * Get last price for multiple instruments at once. USers can either pass
+	 * exchange with tradingsymbol or instrument token only. For example {NSE:NIFTY
+	 * 50, BSE:SENSEX} or {256265, 265}
+	 */
+	public void getLTP(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		String exchange = "NSE";
+		String tradingSymbol = "SBIN-EQ";
+		String symboltoken = "3045";
+		JSONObject ltpData = smartConnect.getLTP(exchange, tradingSymbol, symboltoken);
+	}
 
-//placeOrder
-examples.placeOrder(smartConnect);
+	/** Get tradebook */
+	public void getTrades(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Returns tradebook.
+		List<Trade> trades = smartConnect.getTrades();
+		for (int i = 0; i < trades.size(); i++) {
+			System.out.println(trades.get(i).tradingSymbol + " " + trades.size());
+		}
+	}
 
-//modifyOrder
-examples.modifyOrder(smartConnect);
+	/** Get RMS */
+	public void getRMS(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Returns RMS.
+		JSONObject response = smartConnect.getRMS();
+	}
 
-//cancelOrder
-examples.cancelOrder(smartConnect);
+	/** Get Holdings */
+	public void getHolding(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Returns Holding.
+		JSONObject response = smartConnect.getHolding();
+	}
 
-//getOrder
-examples.getOrder(smartConnect);
+	/** Get Position */
+	public void getPosition(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		// Returns Position.
+		JSONObject response = smartConnect.getPosition();
+	}
 
-//getLTP
-examples.getLTP(smartConnect);
+	/** convert Position */
+	public void convertPosition(SmartConnect smartConnect) throws SmartAPIException, IOException {
 
-//getTrades
-examples.getTrades(smartConnect);
+		JSONObject requestObejct = new JSONObject();
+		requestObejct.put("exchange", "NSE");
+		requestObejct.put("oldproducttype", "DELIVERY");
+		requestObejct.put("newproducttype", "MARGIN");
+		requestObejct.put("tradingsymbol", "SBIN-EQ");
+		requestObejct.put("transactiontype", "BUY");
+		requestObejct.put("quantity", 1);
+		requestObejct.put("type", "DAY");
 
-//getRMS
-examples.getRMS(smartConnect);
+		JSONObject response = smartConnect.getPosition();
+	}
+	
+	/** Logout user. */
+	public void logout(SmartConnect smartConnect) throws SmartAPIException, IOException {
+		/** Logout user and kill session. */
+		JSONObject jsonObject = smartConnect.logout();
+	}
+	
+```
+For more details, take a look at Examples.java in sample directory.
 
-//getHolding
-examples.getHolding(smartConnect);
+## WebSocket live streaming data
 
-//getPosition
-examples.getPosition(smartConnect);
+```java
 
-//convertPosition
-examples.convertPosition(smartConnect);
+	public void tickerUsage(String clientId, String feedToken, String strWatchListScript) throws SmartAPIException {
 
-//logout
-examples.logout(smartConnect);
+		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);
+
+		tickerProvider.setOnConnectedListener(new OnConnect() {
+			@Override
+			public void onConnected() {
+				System.out.println("onConnected");
+				tickerProvider.subscribe(strWatchListScript);
+
+			}
+		});
+
+		tickerProvider.setOnDisconnectedListener(new OnDisconnect() {
+			@Override
+			public void onDisconnected() {
+				System.out.println("onDisconnected");
+			}
+		});
+
+		/** Set error listener to listen to errors. */
+		tickerProvider.setOnErrorListener(new OnError() {
+			@Override
+			public void onError(Exception exception) {
+				System.out.println("onError: " + exception.getMessage());
+			}
+
+			@Override
+			public void onError(SmartAPIException smartAPIException) {
+				System.out.println("onError: " + smartAPIException.getMessage());
+			}
+
+			@Override
+			public void onError(String error) {
+				System.out.println("onError: " + error);
+			}
+		});
+
+		tickerProvider.setOnTickerArrivalListener(new OnTicks() {
+			@Override
+			public void onTicks(JSONArray ticks) {
+				System.out.println("ticker data: " + ticks.toString());
+			}
+		});
+		// Make sure this is called before calling connect.
+		tickerProvider.setTryReconnection(true);
+		// maximum retries and should be greater than 0
+		tickerProvider.setMaximumRetries(10);
+		// set maximum retry interval in seconds
+		tickerProvider.setMaximumRetryInterval(30);
+
+		/**
+		 * connects to Smart API ticker server for getting live quotes
+		 */
+		tickerProvider.connect();
+
+		/**
+		 * You can check, if websocket connection is open or not using the following
+		 * method.
+		 */
+		boolean isConnected = tickerProvider.isConnectionOpen();
+		System.out.println(isConnected);
+
+		// After using SmartAPI ticker, close websocket connection.
+		// tickerProvider.disconnect();
+
+	}
 
 ```
 For more details, take a look at Examples.java in sample directory.

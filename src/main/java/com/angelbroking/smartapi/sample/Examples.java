@@ -3,6 +3,7 @@ package com.angelbroking.smartapi.sample;
 import java.io.IOException;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.angelbroking.smartapi.SmartConnect;
@@ -11,6 +12,11 @@ import com.angelbroking.smartapi.models.Order;
 import com.angelbroking.smartapi.models.OrderParams;
 import com.angelbroking.smartapi.models.Trade;
 import com.angelbroking.smartapi.models.User;
+import com.angelbroking.smartapi.ticker.OnConnect;
+import com.angelbroking.smartapi.ticker.OnDisconnect;
+import com.angelbroking.smartapi.ticker.OnError;
+import com.angelbroking.smartapi.ticker.OnTicks;
+import com.angelbroking.smartapi.ticker.SmartAPITicker;
 import com.angelbroking.smartapi.utils.Constants;
 
 public class Examples {
@@ -21,18 +27,6 @@ public class Examples {
 
 	/** Place order. */
 	public void placeOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
-		/**
-		 * Place order method requires a orderParams argument which contains,
-		 * tradingsymbol, exchange, transaction_type, order_type, quantity, product,
-		 * price, trigger_price, disclosed_quantity, validity squareoff_value,
-		 * stoploss_value, trailing_stoploss and variety (value can be regular, bo, co,
-		 * amo) place order will return order model which will have only orderId in the
-		 * order model
-		 *
-		 * Following is an example param for LIMIT order, if a call fails then
-		 * SmartAPIException will have error message in it Success of this call implies
-		 * only order has been placed successfully, not order execution.
-		 */
 
 		OrderParams orderParams = new OrderParams();
 		orderParams.variety = "NORMAL";
@@ -47,8 +41,6 @@ public class Examples {
 		orderParams.price = 122.2;
 		orderParams.squareoff = "0";
 		orderParams.stoploss = "0";
-		// orderParams.tag = "myTag"; //tag is optional and it cannot be more than 8
-		// characters and only alphanumeric is allowed
 
 		Order order = smartConnect.placeOrder(orderParams, Constants.VARIETY_REGULAR);
 	}
@@ -139,6 +131,74 @@ public class Examples {
 		requestObejct.put("type", "DAY");
 
 		JSONObject response = smartConnect.getPosition();
+	}
+
+	public void tickerUsage(String clientId, String feedToken, String strWatchListScript) throws SmartAPIException {
+
+		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);
+
+		tickerProvider.setOnConnectedListener(new OnConnect() {
+			@Override
+			public void onConnected() {
+				System.out.println("onConnected");
+				tickerProvider.subscribe(strWatchListScript);
+
+			}
+		});
+
+		tickerProvider.setOnDisconnectedListener(new OnDisconnect() {
+			@Override
+			public void onDisconnected() {
+				System.out.println("onDisconnected");
+			}
+		});
+
+		/** Set error listener to listen to errors. */
+		tickerProvider.setOnErrorListener(new OnError() {
+			@Override
+			public void onError(Exception exception) {
+				System.out.println("onError: " + exception.getMessage());
+			}
+
+			@Override
+			public void onError(SmartAPIException smartAPIException) {
+				System.out.println("onError: " + smartAPIException.getMessage());
+			}
+
+			@Override
+			public void onError(String error) {
+				System.out.println("onError: " + error);
+			}
+		});
+
+		tickerProvider.setOnTickerArrivalListener(new OnTicks() {
+			@Override
+			public void onTicks(JSONArray ticks) {
+				System.out.println("ticker data: " + ticks.toString());
+			}
+		});
+		// Make sure this is called before calling connect.
+		tickerProvider.setTryReconnection(true);
+		// maximum retries and should be greater than 0
+		tickerProvider.setMaximumRetries(10);
+		// set maximum retry interval in seconds
+		tickerProvider.setMaximumRetryInterval(30);
+
+		/**
+		 * connects to Smart API ticker server for getting live quotes
+		 */
+		tickerProvider.connect();
+
+		/**
+		 * You can check, if websocket connection is open or not using the following
+		 * method.
+		 */
+		boolean isConnected = tickerProvider.isConnectionOpen();
+		System.out.println(isConnected);
+
+		// After using SmartAPI ticker, close websocket connection.
+		// tickerProvider.disconnect();
+
 	}
 
 	/** Logout user. */
