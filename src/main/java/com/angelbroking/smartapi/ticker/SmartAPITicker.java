@@ -216,6 +216,7 @@ public class SmartAPITicker {
 	 */
 	public void connect() {
 		try {
+			System.out.println("in connect");
 			ws.setPingInterval(pingInterval);
 			ws.connect();
 		} catch (WebSocketException e) {
@@ -372,7 +373,14 @@ public class SmartAPITicker {
 	public void sendText() {
 
 		JSONObject wsJSONRequest = new JSONObject();
+		JSONObject wsJSONRequest2 = new JSONObject();
 		try {
+
+			wsJSONRequest2.put("task", "cn");
+			wsJSONRequest2.put("channel", "");
+			wsJSONRequest2.put("token", this.feedToken);
+			wsJSONRequest2.put("user", this.clientId);
+			wsJSONRequest2.put("acctid", this.clientId);
 
 			wsJSONRequest = new JSONObject();
 			wsJSONRequest.put("task", "cn");
@@ -386,6 +394,8 @@ public class SmartAPITicker {
 		}
 
 		if (ws != null) {
+
+			ws.sendText(wsJSONRequest2.toString());
 			ws.sendText(wsJSONRequest.toString());
 		}
 	}

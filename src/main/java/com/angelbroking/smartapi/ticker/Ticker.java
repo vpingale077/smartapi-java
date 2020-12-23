@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 
 import org.json.JSONObject;
 
-import com.angelbroking.smartapi.Routes;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketExtension;
@@ -14,22 +13,28 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 
 public class Ticker {
 
-	private static final String SERVER = new Routes().getWsuri();
+	private static final String SERVER = "wss://omnefeeds.angelbroking.com/NestHtml5Mobile/socket/stream";
 	private static final int TIMEOUT = 5000;
 
 	public void connect(String clientId, String feedToken, String script) throws Exception {
 
+		System.out.println("in connect1");
+
 		// Connect to the echo server.
 		WebSocket ws = connect();
 
-//		JSONObject wsJSONRequest = new JSONObject();
-//		wsJSONRequest.put("task", "cn");
-//		wsJSONRequest.put("channel", "");
-//		wsJSONRequest.put("token", feedToken);
-//		wsJSONRequest.put("user", clientId);
-//		wsJSONRequest.put("acctid", clientId);
-//
-//		ws.sendText(wsJSONRequest.toString());
+		System.out.println("in connect2");
+
+		JSONObject wsJSONRequest = new JSONObject();
+		wsJSONRequest.put("task", "cn");
+		wsJSONRequest.put("channel", "");
+		wsJSONRequest.put("token", feedToken);
+		wsJSONRequest.put("user", clientId);
+		wsJSONRequest.put("acctid", clientId);
+
+		ws.sendText(wsJSONRequest.toString());
+
+		System.out.println("in connect3");
 
 		JSONObject wsJSONRequest_2 = new JSONObject();
 		wsJSONRequest_2.put("task", "cn");
@@ -40,8 +45,12 @@ public class Ticker {
 
 		ws.sendText(wsJSONRequest_2.toString());
 
+		System.out.println("in connect4");
+
 		// Close the web socket.
 		ws.disconnect();
+
+		System.out.println("disconnect");
 
 	}
 
@@ -49,7 +58,7 @@ public class Ticker {
 	 * Connect to the server.
 	 */
 	private static WebSocket connect() throws Exception {
-		return new WebSocketFactory().setConnectionTimeout(TIMEOUT).createSocket(SERVER)
+		return new WebSocketFactory().setVerifyHostname(false).setConnectionTimeout(TIMEOUT).createSocket(SERVER)
 				.addListener(new WebSocketAdapter() {
 					// A text message arrived from the server.
 					public void onTextMessage(WebSocket websocket, String message) {

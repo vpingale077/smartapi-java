@@ -163,10 +163,12 @@ public class SmartConnect {
 		JSONObject loginResultObject = smartAPIRequestHandler.postRequest(this.apiKey, routes.getLoginUrl(), params);
 		String jwtToken = loginResultObject.getJSONObject("data").getString("jwtToken");
 		String refreshToken = loginResultObject.getJSONObject("data").getString("refreshToken");
+		String feedToken = loginResultObject.getJSONObject("data").getString("feedToken");
 		String url = routes.get("api.user.profile");
 		User user = new User().parseResponse(smartAPIRequestHandler.getRequest(this.apiKey, url, jwtToken));
 		user.setAccessToken(jwtToken);
 		user.setRefreshToken(refreshToken);
+		user.setFeedToken(feedToken);
 
 		return user;
 

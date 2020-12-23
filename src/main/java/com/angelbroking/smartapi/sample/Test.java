@@ -24,6 +24,7 @@ public class Test {
 			});
 
 			User user = smartConnect.generateSession("S212741", "pass@123");
+			System.out.println(user.toString());
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
 

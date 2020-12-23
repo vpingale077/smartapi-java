@@ -3,6 +3,7 @@ package com.angelbroking.smartapi.models;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.json.JSONArray;
@@ -195,6 +196,14 @@ public class User {
 
 	public void setFeedToken(String feedToken) {
 		this.feedToken = feedToken;
+	}
+
+	@Override
+	public String toString() {
+		return "User [userName=" + userName + ", userId=" + userId + ", mobileNo=" + mobileNo + ", brokerName="
+				+ brokerName + ", email=" + email + ", lastLoginTime=" + lastLoginTime + ", accessToken=" + accessToken
+				+ ", refreshToken=" + refreshToken + ", products=" + Arrays.toString(products) + ", exchanges="
+				+ Arrays.toString(exchanges) + ", feedToken=" + feedToken + "]";
 	}
 
 }
