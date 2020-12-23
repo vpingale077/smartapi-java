@@ -4,8 +4,8 @@ The official Java client for communicating with [Smart API Connect API](https://
 Smart API is a set of REST-like APIs that expose many capabilities required to build a complete investment and trading platform. Execute orders in real time, manage user portfolio, stream live market data (WebSockets), and more, with the simple HTTP API collection.
 
 ## Documentation
-- [Smart API - HTTP API documentation] (https://smartapi.angelbroking.com/docs/connect/v1/)
-- [Java library documentation](https://smartapi.angelbroking.com/docs/connect/v1/)
+- [Smart API - HTTP API documentation] (https://smartapi.angelbroking.com/docs)
+- [Java library documentation](https://smartapi.angelbroking.com/docs/connect)
 
 ## Usage
 - [Download SmartAPI jar file](https://github.com/angelbroking-github/smartapi-java/blob/main/dist) and include it in your build path.
@@ -28,7 +28,7 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 	}
 	});
 	
-	User user = smartConnect.generateSession("S212741", "pass@123");
+	User user = smartConnect.generateSession(<clientId>, <password>);
 	System.out.println(user.toString());
 	smartConnect.setAccessToken(user.getAccessToken());
 	smartConnect.setUserId(user.getUserId());
@@ -160,6 +160,13 @@ For more details, take a look at Examples.java in sample directory.
 
 ```java
 
+	// SmartAPITicker
+	String clientId = "<clientID>";
+			
+	// feedTokne - User user = smartConnect.generateSession(<clientId>, <password>);
+	String feedToken = user.getFeedToken();
+	String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
+			
 	public void tickerUsage(String clientId, String feedToken, String strWatchListScript) throws SmartAPIException {
 
 		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);

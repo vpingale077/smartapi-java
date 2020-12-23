@@ -18,7 +18,7 @@ import com.angelbroking.smartapi.ticker.OnError;
 import com.angelbroking.smartapi.ticker.OnTicks;
 import com.angelbroking.smartapi.ticker.SmartAPITicker;
 import com.angelbroking.smartapi.utils.Constants;
-
+@SuppressWarnings("unused")
 public class Examples {
 
 	public void getProfile(SmartConnect smartConnect) throws IOException, SmartAPIException {
