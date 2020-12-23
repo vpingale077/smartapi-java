@@ -13,7 +13,7 @@ public class Test {
 			SmartConnect smartConnect = new SmartConnect();
 
 			// PROVIDE YOUR API KEY HERE
-			smartConnect.setApiKey("smartapi_key");
+			smartConnect.setApiKey("<your_api_key>");
 
 			// Set session expiry callback.
 			smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
@@ -23,7 +23,7 @@ public class Test {
 				}
 			});
 
-			User user = smartConnect.generateSession("S212741", "pass@123");
+			User user = smartConnect.generateSession("<clientId>", "<password>");
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
 
@@ -73,7 +73,8 @@ public class Test {
 			examples.logout(smartConnect);
 
 			// SmartAPITicker
-			String clientId = "S212741";
+			String clientId = "<clientId>";
+			// feedToken - User user = smartConnect.generateSession("<clientId>", "<password>");
 			String feedToken = user.getFeedToken();
 			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
 			
