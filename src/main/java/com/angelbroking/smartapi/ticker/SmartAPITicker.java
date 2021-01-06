@@ -368,8 +368,9 @@ public class SmartAPITicker {
 	private void reconnect() {
 		nonUserDisconnect();
 		try {
-			ws = new WebSocketFactory().createSocket(wsuri);
-		} catch (IOException e) {
+			SSLContext context = NaiveSSLContext.getInstance("TLS");
+			ws = new WebSocketFactory().setSSLContext(context).setVerifyHostname(false).createSocket(wsuri);
+		} catch (IOException | NoSuchAlgorithmException e) {
 			if (onErrorListener != null) {
 				onErrorListener.onError(e);
 			}
