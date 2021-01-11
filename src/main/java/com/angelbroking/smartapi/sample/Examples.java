@@ -18,6 +18,7 @@ import com.angelbroking.smartapi.ticker.OnError;
 import com.angelbroking.smartapi.ticker.OnTicks;
 import com.angelbroking.smartapi.ticker.SmartAPITicker;
 import com.angelbroking.smartapi.utils.Constants;
+
 @SuppressWarnings("unused")
 public class Examples {
 
@@ -133,7 +134,8 @@ public class Examples {
 		JSONObject response = smartConnect.getPosition();
 	}
 
-	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task) throws SmartAPIException {
+	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task)
+			throws SmartAPIException {
 
 		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);
 
@@ -141,8 +143,8 @@ public class Examples {
 			@Override
 			public void onConnected() {
 				System.out.println("onConnected");
-				tickerProvider.subscribe(strWatchListScript, task);
 
+				tickerProvider.subscribe(strWatchListScript, task);
 			}
 		});
 
@@ -177,10 +179,6 @@ public class Examples {
 				System.out.println("ticker data: " + ticks.toString());
 			}
 		});
-		// Make sure this is called before calling connect.
-		tickerProvider.setTryReconnection(true);
-		// set maximum retry interval in seconds
-		tickerProvider.setMaximumRetryInterval(30);
 
 		/**
 		 * connects to Smart API ticker server for getting live quotes

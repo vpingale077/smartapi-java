@@ -6,11 +6,11 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
 import java.util.zip.InflaterOutputStream;
 
@@ -37,18 +37,6 @@ public class SmartAPITicker {
 	private OnDisconnect onDisconnectedListener;
 	private OnError onErrorListener;
 	private WebSocket ws;
-
-	private long lastPongAt = 0;
-	private int count = 0;
-	private Timer timer = null;
-	private boolean tryReconnection = false;
-	private final int pingInterval = 2500;
-	private final int pongCheckInterval = 2500;
-	private int nextReconnectInterval = 0;
-	private int maxRetryInterval = 30000;
-	private Timer canReconnectTimer = null;
-	/** Used to reconnect after the specified delay. */
-	private boolean canReconnect = true;
 	private String clientId;
 	private String feedToken;
 
@@ -75,72 +63,7 @@ public class SmartAPITicker {
 		}
 
 		ws.addListener(getWebsocketAdapter());
-	}
 
-	/**
-	 * Returns task which performs check every second for reconnection.
-	 * 
-	 * @return TimerTask returns timer task which will be invoked after user defined
-	 *         interval and tries reconnect.
-	 */
-	private TimerTask getTask() {
-		TimerTask checkForRestartTask = new TimerTask() {
-			@Override
-			public void run() {
-				if (lastPongAt == 0)
-					return;
-
-				Date currentDate = new Date();
-				long timeInterval = (currentDate.getTime() - lastPongAt);
-				if (timeInterval >= 2 * pingInterval) {
-					doReconnect();
-				}
-			}
-		};
-		return checkForRestartTask;
-	}
-
-	/**
-	 * Performs reconnection after a particular interval if count is less than
-	 * maximum retries.
-	 */
-	public void doReconnect() {
-		if (!tryReconnection)
-			return;
-
-		if (nextReconnectInterval == 0) {
-			nextReconnectInterval = (int) (2000 * Math.pow(2, count));
-		} else {
-			nextReconnectInterval = (int) (nextReconnectInterval * Math.pow(2, count));
-		}
-
-		if (nextReconnectInterval > maxRetryInterval) {
-			nextReconnectInterval = maxRetryInterval;
-		}
-		if (true) {
-			if (canReconnect) {
-				count++;
-				reconnect();
-				canReconnect = false;
-				canReconnectTimer = new Timer();
-				canReconnectTimer.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						canReconnect = true;
-					}
-				}, nextReconnectInterval);
-			}
-		}
-	}
-
-	/**
-	 * Set tryReconnection, to instruct SmartAPITicker that it has to reconnect, if
-	 * com.angelbroking.smartapi.ticker is disconnected.
-	 * 
-	 * @param retry will denote whether reconnection should be tried or not.
-	 */
-	public void setTryReconnection(boolean retry) {
-		tryReconnection = retry;
 	}
 
 	/**
@@ -151,16 +74,6 @@ public class SmartAPITicker {
 	 */
 	public void setOnErrorListener(OnError listener) {
 		onErrorListener = listener;
-	}
-
-	/* Set a maximum interval for every retry. */
-	public void setMaximumRetryInterval(int interval) throws SmartAPIException {
-		if (interval >= 5) {
-			// convert to milliseconds
-			maxRetryInterval = interval * 1000;
-		} else {
-			throw new SmartAPIException("Maximum retry interval can't be less than 0");
-		}
 	}
 
 	/**
@@ -190,54 +103,40 @@ public class SmartAPITicker {
 		onDisconnectedListener = listener;
 	}
 
-	/**
-	 * Establishes a web socket connection.
-	 */
-	public void connect() {
-		try {
-			ws.setPingInterval(pingInterval);
-			ws.connect();
-		} catch (WebSocketException e) {
-			e.printStackTrace();
-			if (onErrorListener != null) {
-				onErrorListener.onError(e);
-			}
-			if (tryReconnection) {
-				if (timer == null) {
-					// this is to handle reconnection first time
-					if (lastPongAt == 0) {
-						lastPongAt = 1;
-					}
-					timer = new Timer();
-					timer.scheduleAtFixedRate(getTask(), 0, pongCheckInterval);
-				}
-			}
-		}
-	}
-
 	/** Returns a WebSocketAdapter to listen to ticker related events. */
 	public WebSocketAdapter getWebsocketAdapter() {
 		return new WebSocketAdapter() {
 
 			@Override
-			public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
-				count = 0;
-				nextReconnectInterval = 0;
+			public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws WebSocketException {
+				// Send a text frame.
+				JSONObject wsCNJSONRequest = new JSONObject();
+				wsCNJSONRequest.put("task", "cn");
+				wsCNJSONRequest.put("channel", "");
+				wsCNJSONRequest.put("token", feedToken);
+				wsCNJSONRequest.put("user", clientId);
+				wsCNJSONRequest.put("acctid", clientId);
+				ws.sendText(wsCNJSONRequest.toString());
+				onConnectedListener.onConnected();
 
-				if (onConnectedListener != null) {
-					onConnectedListener.onConnected();
-				}
-
-				if (tryReconnection) {
-					if (timer != null) {
-						timer.cancel();
+				Runnable runnable = new Runnable() {
+					public void run() {
+						JSONObject wsMWJSONRequest = new JSONObject();
+						wsMWJSONRequest.put("task", "hb");
+						wsMWJSONRequest.put("channel", "");
+						wsMWJSONRequest.put("token", feedToken);
+						wsMWJSONRequest.put("user", clientId);
+						wsMWJSONRequest.put("acctid", clientId);
+						ws.sendText(wsMWJSONRequest.toString());
 					}
-					timer = new Timer();
-					timer.scheduleAtFixedRate(getTask(), 0, pongCheckInterval);
+				};
 
-				}
-				
-				
+				ScheduledExecutorService service = Executors
+
+						.newSingleThreadScheduledExecutor();
+
+				service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.MINUTES);
+
 			}
 
 			@Override
@@ -257,20 +156,6 @@ public class SmartAPITicker {
 			public void onBinaryMessage(WebSocket websocket, byte[] binary) {
 				try {
 					super.onBinaryMessage(websocket, binary);
-				} catch (Exception e) {
-					e.printStackTrace();
-					if (onErrorListener != null) {
-						onErrorListener.onError(e);
-					}
-				}
-			}
-
-			@Override
-			public void onPongFrame(WebSocket websocket, WebSocketFrame frame) {
-				try {
-					super.onPongFrame(websocket, frame);
-					Date date = new Date();
-					lastPongAt = date.getTime();
 				} catch (Exception e) {
 					e.printStackTrace();
 					if (onErrorListener != null) {
@@ -314,17 +199,8 @@ public class SmartAPITicker {
 
 	/** Disconnects websocket connection. */
 	public void disconnect() {
-		if (timer != null) {
-			timer.cancel();
-		}
-		if (ws != null && ws.isOpen()) {
-			ws.disconnect();
-		}
-	}
 
-	/** Disconnects websocket connection only for internal use */
-	private void nonUserDisconnect() {
-		if (ws != null) {
+		if (ws != null && ws.isOpen()) {
 			ws.disconnect();
 		}
 	}
@@ -343,48 +219,13 @@ public class SmartAPITicker {
 		return false;
 	}
 
-	/** Disconnects and reconnects */
-	private void reconnect() {
-		nonUserDisconnect();
-		try {
-			SSLContext context = NaiveSSLContext.getInstance("TLS");
-			ws = new WebSocketFactory().setSSLContext(context).setVerifyHostname(false).createSocket(wsuri);
-		} catch (IOException | NoSuchAlgorithmException e) {
-			if (onErrorListener != null) {
-				onErrorListener.onError(e);
-			}
-			return;
-		}
-		ws.addListener(getWebsocketAdapter());
-		connect();
-		final OnConnect onUsersConnectedListener = this.onConnectedListener;
-		setOnConnectedListener(new OnConnect() {
-			@Override
-			public void onConnected() {
-				lastPongAt = 0;
-				count = 0;
-				nextReconnectInterval = 0;
-				onConnectedListener = onUsersConnectedListener;
-			}
-		});
-	}
-
 	/**
 	 * Subscribes script.
 	 */
 	public void subscribe(String script, String task) {
+
 		if (ws != null) {
 			if (ws.isOpen()) {
-
-				// Send a text frame.
-				JSONObject wsCNJSONRequest = new JSONObject();
-				wsCNJSONRequest.put("task", "cn");
-				wsCNJSONRequest.put("channel", "");
-				wsCNJSONRequest.put("token", this.feedToken);
-				wsCNJSONRequest.put("user", this.clientId);
-				wsCNJSONRequest.put("acctid", this.clientId);
-
-				ws.sendText(wsCNJSONRequest.toString());
 
 				JSONObject wsMWJSONRequest = new JSONObject();
 				wsMWJSONRequest.put("task", task);
@@ -394,8 +235,6 @@ public class SmartAPITicker {
 				wsMWJSONRequest.put("acctid", this.clientId);
 
 				ws.sendText(wsMWJSONRequest.toString());
-				
-				
 
 			} else {
 				if (onErrorListener != null) {
@@ -416,6 +255,15 @@ public class SmartAPITicker {
 		}
 
 		return os.toByteArray();
+	}
+
+	public void connect() {
+		try {
+			ws.connect();
+		} catch (WebSocketException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

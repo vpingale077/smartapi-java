@@ -84,7 +84,7 @@ public class SmartAPIResponseHandler {
 			return new PermissionException(jsonObject.getString("message"), code);
 
 		default:
-			return new SmartAPIException(jsonObject.getString("message"), code);
+			return new SmartAPIException(jsonObject.getString("data not found"));
 		}
 	}
 

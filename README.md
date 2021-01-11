@@ -167,7 +167,8 @@ For more details, take a look at Examples.java in sample directory.
 	String feedToken = user.getFeedToken();
 	String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
 			
-	public void tickerUsage(String clientId, String feedToken, String strWatchListScript) throws SmartAPIException {
+	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task)
+			throws SmartAPIException {
 
 		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);
 
@@ -175,8 +176,8 @@ For more details, take a look at Examples.java in sample directory.
 			@Override
 			public void onConnected() {
 				System.out.println("onConnected");
-				tickerProvider.subscribe(strWatchListScript);
 
+				tickerProvider.subscribe(strWatchListScript, task);
 			}
 		});
 
@@ -211,12 +212,6 @@ For more details, take a look at Examples.java in sample directory.
 				System.out.println("ticker data: " + ticks.toString());
 			}
 		});
-		// Make sure this is called before calling connect.
-		tickerProvider.setTryReconnection(true);
-		// maximum retries and should be greater than 0
-		tickerProvider.setMaximumRetries(10);
-		// set maximum retry interval in seconds
-		tickerProvider.setMaximumRetryInterval(30);
 
 		/**
 		 * connects to Smart API ticker server for getting live quotes

@@ -24,6 +24,7 @@ public class Test {
 			});
 
 			User user = smartConnect.generateSession("<clientId>", "<password>");
+			System.out.println(user.getAccessToken());
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
 
@@ -74,10 +75,11 @@ public class Test {
 
 			// SmartAPITicker
 			String clientId = "<clientId>";
+
 			// feedToken - User user = smartConnect.generateSession("<clientId>",
 			// "<password>");
 			String feedToken = user.getFeedToken();
-			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
+			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536&mcx_fo|221658";
 			String task = "mw";
 			examples.tickerUsage(clientId, feedToken, strWatchListScript, task);
 
