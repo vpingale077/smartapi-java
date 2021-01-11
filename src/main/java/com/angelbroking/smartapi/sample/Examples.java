@@ -142,8 +142,6 @@ public class Examples {
 		tickerProvider.setOnConnectedListener(new OnConnect() {
 			@Override
 			public void onConnected() {
-				System.out.println("onConnected");
-
 				tickerProvider.subscribe(strWatchListScript, task);
 			}
 		});

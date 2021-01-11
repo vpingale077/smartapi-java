@@ -166,6 +166,7 @@ For more details, take a look at Examples.java in sample directory.
 	// feedToken - User user = smartConnect.generateSession(<clientId>, <password>);
 	String feedToken = user.getFeedToken();
 	String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
+	String task = "mw";
 			
 	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task)
 			throws SmartAPIException {
@@ -175,8 +176,6 @@ For more details, take a look at Examples.java in sample directory.
 		tickerProvider.setOnConnectedListener(new OnConnect() {
 			@Override
 			public void onConnected() {
-				System.out.println("onConnected");
-
 				tickerProvider.subscribe(strWatchListScript, task);
 			}
 		});
