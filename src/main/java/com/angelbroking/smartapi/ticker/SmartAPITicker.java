@@ -39,7 +39,6 @@ public class SmartAPITicker {
 	private WebSocket ws;
 
 	private long lastPongAt = 0;
-	private int maxRetries = 10;
 	private int count = 0;
 	private Timer timer = null;
 	private boolean tryReconnection = false;
@@ -118,7 +117,7 @@ public class SmartAPITicker {
 		if (nextReconnectInterval > maxRetryInterval) {
 			nextReconnectInterval = maxRetryInterval;
 		}
-		if (count <= maxRetries) {
+		if (true) {
 			if (canReconnect) {
 				count++;
 				reconnect();
@@ -130,12 +129,6 @@ public class SmartAPITicker {
 						canReconnect = true;
 					}
 				}, nextReconnectInterval);
-			}
-		} else if (count > maxRetries) {
-			// if number of tries exceeds maximum number of retries then stop timer.
-			if (timer != null) {
-				timer.cancel();
-				timer = null;
 			}
 		}
 	}
@@ -158,22 +151,6 @@ public class SmartAPITicker {
 	 */
 	public void setOnErrorListener(OnError listener) {
 		onErrorListener = listener;
-	}
-
-	/**
-	 * Set max number of retries for reconnection, for infinite retries set value as
-	 * -1.
-	 * 
-	 * @param maxRetries denotes maximum number of retries that the
-	 *                   com.angelbroking.smartapi.ticker can perform.
-	 * @throws SmartAPIException when maximum retries is less than 0.
-	 */
-	public void setMaximumRetries(int maxRetries) throws SmartAPIException {
-		if (maxRetries > 0) {
-			this.maxRetries = maxRetries;
-		} else {
-			throw new SmartAPIException("Maximum retries can't be less than 0");
-		}
 	}
 
 	/* Set a maximum interval for every retry. */
@@ -259,6 +236,8 @@ public class SmartAPITicker {
 					timer.scheduleAtFixedRate(getTask(), 0, pongCheckInterval);
 
 				}
+				
+				
 			}
 
 			@Override
@@ -393,7 +372,7 @@ public class SmartAPITicker {
 	/**
 	 * Subscribes script.
 	 */
-	public void subscribe(String script) {
+	public void subscribe(String script, String task) {
 		if (ws != null) {
 			if (ws.isOpen()) {
 
@@ -408,13 +387,15 @@ public class SmartAPITicker {
 				ws.sendText(wsCNJSONRequest.toString());
 
 				JSONObject wsMWJSONRequest = new JSONObject();
-				wsMWJSONRequest.put("task", "mw");
+				wsMWJSONRequest.put("task", task);
 				wsMWJSONRequest.put("channel", script);
 				wsMWJSONRequest.put("token", this.feedToken);
 				wsMWJSONRequest.put("user", this.clientId);
 				wsMWJSONRequest.put("acctid", this.clientId);
 
 				ws.sendText(wsMWJSONRequest.toString());
+				
+				
 
 			} else {
 				if (onErrorListener != null) {

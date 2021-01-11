@@ -74,11 +74,12 @@ public class Test {
 
 			// SmartAPITicker
 			String clientId = "<clientId>";
-			// feedToken - User user = smartConnect.generateSession("<clientId>", "<password>");
+			// feedToken - User user = smartConnect.generateSession("<clientId>",
+			// "<password>");
 			String feedToken = user.getFeedToken();
 			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536";
-			
-			examples.tickerUsage(clientId, feedToken, strWatchListScript);
+			String task = "mw";
+			examples.tickerUsage(clientId, feedToken, strWatchListScript, task);
 
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());

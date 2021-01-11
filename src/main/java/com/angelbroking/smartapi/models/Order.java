@@ -7,23 +7,17 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Order {
 
-	@SerializedName("exchange_order_id")
-	public String exchangeOrderId;
-
 	@SerializedName("disclosedquantity")
 	public String disclosedQuantity;
 
 	@SerializedName("duration")
-	public String validity;
+	public String duration;
 
 	@SerializedName("tradingsymbol")
 	public String tradingSymbol;
 
 	@SerializedName("variety")
-	public String orderVariety;
-
-	@SerializedName("user_id")
-	public String userId;
+	public String variety;
 
 	@SerializedName("ordertype")
 	public String orderType;
@@ -32,7 +26,7 @@ public class Order {
 	public String triggerPrice;
 
 	@SerializedName("text")
-	public String statusMessage;
+	public String text;
 
 	@SerializedName("price")
 	public String price;
@@ -41,10 +35,7 @@ public class Order {
 	public String status;
 
 	@SerializedName("producttype")
-	public String product;
-
-	@SerializedName("placed_by")
-	public String accountId;
+	public String productType;
 
 	@SerializedName("exchange")
 	public String exchange;
@@ -55,11 +46,8 @@ public class Order {
 	@SerializedName("symbol")
 	public String symbol;
 
-	@SerializedName("pending_quantity")
-	public String pendingQuantity;
-
 	@SerializedName("updatetime")
-	public String orderTimestamp;
+	public String updateTime;
 
 	@SerializedName("exchtime")
 	public String exchangeTimestamp;
@@ -67,39 +55,74 @@ public class Order {
 	@SerializedName("exchorderupdatetime")
 	public String exchangeUpdateTimestamp;
 
-	@SerializedName("average_price")
+	@SerializedName("averageprice")
 	public String averagePrice;
 
 	@SerializedName("transactiontype")
 	public String transactionType;
 
-	@SerializedName("filled_quantity")
-	public String filledQuantity;
-
 	@SerializedName("quantity")
 	public String quantity;
 
-	@SerializedName("parent_order_id")
-	public String parentOrderId;
+	@SerializedName("squareoff")
+	public String squareOff;
 
-	@SerializedName("tag")
-	public String tag;
+	@SerializedName("stoploss")
+	public String stopLoss;
 
-	@SerializedName("guid")
-	public String guid;
+	@SerializedName("trailingstoploss")
+	public String trailingStopLoss;
+
+	@SerializedName("symboltoken")
+	public String symbolToken;
+
+	@SerializedName("instrumenttype")
+	public String instrumentType;
+
+	@SerializedName("strikeprice")
+	public String strikePrice;
+
+	@SerializedName("optiontype")
+	public String optionType;
+
+	@SerializedName("expirydate")
+	public String expiryDate;
+
+	@SerializedName("lotsize")
+	public String lotSize;
+
+	@SerializedName("cancelsize")
+	public String cancelSize;
+
+	@SerializedName("filledshares")
+	public String filledShares;
+
+	@SerializedName("orderstatus")
+	public String orderStatus;
+
+	@SerializedName("unfilledshares")
+	public String unfilledShares;
+
+	@SerializedName("fillid")
+	public String fillId;
+
+	@SerializedName("filltime")
+	public String fillTime;
 
 	@Override
 	public String toString() {
-		return "Order [exchangeOrderId=" + exchangeOrderId + ", disclosedQuantity=" + disclosedQuantity + ", validity="
-				+ validity + ", tradingSymbol=" + tradingSymbol + ", orderVariety=" + orderVariety + ", userId="
-				+ userId + ", orderType=" + orderType + ", triggerPrice=" + triggerPrice + ", statusMessage="
-				+ statusMessage + ", price=" + price + ", status=" + status + ", product=" + product + ", accountId="
-				+ accountId + ", exchange=" + exchange + ", orderId=" + orderId + ", symbol=" + symbol
-				+ ", pendingQuantity=" + pendingQuantity + ", orderTimestamp=" + orderTimestamp + ", exchangeTimestamp="
-				+ exchangeTimestamp + ", exchangeUpdateTimestamp=" + exchangeUpdateTimestamp + ", averagePrice="
-				+ averagePrice + ", transactionType=" + transactionType + ", filledQuantity=" + filledQuantity
-				+ ", quantity=" + quantity + ", parentOrderId=" + parentOrderId + ", tag=" + tag + ", guid=" + guid
-				+ "]";
+		return "Order [disclosedQuantity=" + disclosedQuantity + ", duration=" + duration + ", tradingSymbol="
+				+ tradingSymbol + ", variety=" + variety + ", orderType=" + orderType + ", triggerPrice=" + triggerPrice
+				+ ", text=" + text + ", price=" + price + ", status=" + status + ", productType=" + productType
+				+ ", exchange=" + exchange + ", orderId=" + orderId + ", symbol=" + symbol + ", updateTime="
+				+ updateTime + ", exchangeTimestamp=" + exchangeTimestamp + ", exchangeUpdateTimestamp="
+				+ exchangeUpdateTimestamp + ", averagePrice=" + averagePrice + ", transactionType=" + transactionType
+				+ ", quantity=" + quantity + ", squareOff=" + squareOff + ", stopLoss=" + stopLoss
+				+ ", trailingStopLoss=" + trailingStopLoss + ", symbolToken=" + symbolToken + ", instrumentType="
+				+ instrumentType + ", strikePrice=" + strikePrice + ", optionType=" + optionType + ", expiryDate="
+				+ expiryDate + ", lotSize=" + lotSize + ", cancelSize=" + cancelSize + ", filledShares=" + filledShares
+				+ ", orderStatus=" + orderStatus + ", unfilledShares=" + unfilledShares + ", fillId=" + fillId
+				+ ", fillTime=" + fillTime + "]";
 	}
 
 }

@@ -133,7 +133,7 @@ public class Examples {
 		JSONObject response = smartConnect.getPosition();
 	}
 
-	public void tickerUsage(String clientId, String feedToken, String strWatchListScript) throws SmartAPIException {
+	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task) throws SmartAPIException {
 
 		SmartAPITicker tickerProvider = new SmartAPITicker(clientId, feedToken);
 
@@ -141,7 +141,7 @@ public class Examples {
 			@Override
 			public void onConnected() {
 				System.out.println("onConnected");
-				tickerProvider.subscribe(strWatchListScript);
+				tickerProvider.subscribe(strWatchListScript, task);
 
 			}
 		});
@@ -179,8 +179,6 @@ public class Examples {
 		});
 		// Make sure this is called before calling connect.
 		tickerProvider.setTryReconnection(true);
-		// maximum retries and should be greater than 0
-		tickerProvider.setMaximumRetries(10);
 		// set maximum retry interval in seconds
 		tickerProvider.setMaximumRetryInterval(30);
 
