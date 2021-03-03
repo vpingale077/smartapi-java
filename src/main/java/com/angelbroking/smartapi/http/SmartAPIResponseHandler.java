@@ -23,15 +23,20 @@ import okhttp3.Response;
 public class SmartAPIResponseHandler {
 
 	public JSONObject handle(Response response, String body) throws IOException, SmartAPIException, JSONException {
+		System.out.println("***************************");
 		if (response.header("Content-Type").contains("json")) {
 			JSONObject jsonObject = new JSONObject(body);
-			if (jsonObject.optString("data") == null || jsonObject.optString("data") == "") {
+			
+//			if (jsonObject.optString("data") == null || jsonObject.optString("data") == "") {
+			if (!jsonObject.has("status") || jsonObject.has("success")) {	
 				if (jsonObject.has("errorcode")) {
 					throw dealWithException(jsonObject, jsonObject.getString("errorcode"));
 				} else if (jsonObject.has("errorCode")) {
+					
 					throw dealWithException(jsonObject, jsonObject.getString("errorCode"));
 				}
 			}
+			//System.out.println(jsonObject);
 			return jsonObject;
 		} else {
 			throw new DataException("Unexpected content type received from server: " + response.header("Content-Type")

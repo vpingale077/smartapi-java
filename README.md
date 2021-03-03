@@ -146,6 +146,77 @@ Smart API is a set of REST-like APIs that expose many capabilities required to b
 
 		JSONObject response = smartConnect.getPosition();
 	}
+	/** Create Gtt Rule*/
+	public void createRule(SmartConnect smartConnect)throws SmartAPIException,IOException{
+		GttParams gttParams= new GttParams();
+		
+		gttParams.tradingsymbol="SBIN-EQ";
+		gttParams.symboltoken="3045";
+		gttParams.exchange="NSE";
+		gttParams.producttype="MARGIN";
+		gttParams.transactiontype="BUY";
+		gttParams.price= 100000.01;
+		gttParams.qty=10;
+		gttParams.disclosedqty=10;
+		gttParams.triggerprice=20000.1;
+		gttParams.timeperiod=300;
+		
+		Gtt gtt = smartConnect.gttCreateRule(gttParams);
+	}
+
+	
+	/** Modify Gtt Rule */
+	public void modifyRule(SmartConnect smartConnect)throws SmartAPIException,IOException{
+		GttParams gttParams= new GttParams();
+		
+		gttParams.tradingsymbol="SBIN-EQ";
+		gttParams.symboltoken="3045";
+		gttParams.exchange="NSE";
+		gttParams.producttype="MARGIN";
+		gttParams.transactiontype="BUY";
+		gttParams.price= 100000.1;
+		gttParams.qty=10;
+		gttParams.disclosedqty=10;
+		gttParams.triggerprice=20000.1;
+		gttParams.timeperiod=300;
+		
+		Integer id= 1000051;
+		
+		Gtt gtt = smartConnect.gttModifyRule(id,gttParams);
+	}
+	
+	/** Cancel Gtt Rule */
+	public void cancelRule(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		Integer id=1000051;
+		String symboltoken="3045";
+		String exchange="NSE";
+		
+		Gtt gtt = smartConnect.gttCancelRule(id,symboltoken,exchange);
+	}
+	
+	/** Gtt Rule Details */
+	public void ruleDetails(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		Integer id=1000051;
+	
+		JSONObject gtt = smartConnect.gttRuleDetails(id);
+	}
+	
+	/** Gtt Rule Lists */
+	public void ruleList(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		
+		List<String> status=new ArrayList<String>(){{
+			add("NEW");
+			add("CANCELLED");
+			add("ACTIVE");
+			add("SENTTOEXCHANGE");
+			add("FORALL");
+			}};
+		Integer page=1;
+		Integer count=10;
+	
+		JSONArray gtt = smartConnect.gttRuleList(status,page,count);
+	}
+
 	
 	/** Logout user. */
 	public void logout(SmartConnect smartConnect) throws SmartAPIException, IOException {
