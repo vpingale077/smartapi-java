@@ -1,6 +1,7 @@
 package com.angelbroking.smartapi.sample;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -8,6 +9,8 @@ import org.json.JSONObject;
 
 import com.angelbroking.smartapi.SmartConnect;
 import com.angelbroking.smartapi.http.exceptions.SmartAPIException;
+import com.angelbroking.smartapi.models.Gtt;
+import com.angelbroking.smartapi.models.GttParams;
 import com.angelbroking.smartapi.models.Order;
 import com.angelbroking.smartapi.models.OrderParams;
 import com.angelbroking.smartapi.models.Trade;
@@ -74,10 +77,11 @@ public class Examples {
 
 	/** Get order details */
 	public void getOrder(SmartConnect smartConnect) throws SmartAPIException, IOException {
-		List<Order> orders = smartConnect.getOrderHistory(smartConnect.getUserId());
-		for (int i = 0; i < orders.size(); i++) {
-			System.out.println(orders.get(i).orderId + " " + orders.get(i).status);
-		}
+		JSONObject orders = smartConnect.getOrderHistory(smartConnect.getUserId());
+		System.out.print(orders);
+//		for (int i = 0; i < orders.size(); i++) {
+//			System.out.println(orders.get(i).orderId + " " + orders.get(i).status);
+//		}
 	}
 
 	/**
@@ -95,10 +99,8 @@ public class Examples {
 	/** Get tradebook */
 	public void getTrades(SmartConnect smartConnect) throws SmartAPIException, IOException {
 		// Returns tradebook.
-		List<Trade> trades = smartConnect.getTrades();
-		for (int i = 0; i < trades.size(); i++) {
-			System.out.println(trades.get(i).tradingSymbol + " " + trades.size());
-		}
+		JSONObject trades = smartConnect.getTrades();
+		
 	}
 
 	/** Get RMS */
@@ -133,7 +135,73 @@ public class Examples {
 
 		JSONObject response = smartConnect.getPosition();
 	}
-
+	/** Create Gtt Rule*/
+	public void createRule(SmartConnect smartConnect)throws SmartAPIException,IOException{
+		GttParams gttParams= new GttParams();
+		
+		gttParams.tradingsymbol="SBIN-EQ";
+		gttParams.symboltoken="3045";
+		gttParams.exchange="NSE";
+		gttParams.producttype="MARGIN";
+		gttParams.transactiontype="BUY";
+		gttParams.price= 100000.01;
+		gttParams.qty=10;
+		gttParams.disclosedqty=10;
+		gttParams.triggerprice=20000.1;
+		gttParams.timeperiod=300;
+		
+		Gtt gtt = smartConnect.gttCreateRule(gttParams);
+	}
+	
+	public void modifyRule(SmartConnect smartConnect)throws SmartAPIException,IOException{
+		GttParams gttParams= new GttParams();
+		
+		gttParams.tradingsymbol="SBIN-EQ";
+		gttParams.symboltoken="3045";
+		gttParams.exchange="NSE";
+		gttParams.producttype="MARGIN";
+		gttParams.transactiontype="BUY";
+		gttParams.price= 100000.1;
+		gttParams.qty=10;
+		gttParams.disclosedqty=10;
+		gttParams.triggerprice=20000.1;
+		gttParams.timeperiod=300;
+		
+		Integer id= 1000051;
+		
+		Gtt gtt = smartConnect.gttModifyRule(id,gttParams);
+	}
+	
+	public void cancelRule(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		Integer id=1000051;
+		String symboltoken="3045";
+		String exchange="NSE";
+		
+		Gtt gtt = smartConnect.gttCancelRule(id,symboltoken,exchange);
+	}
+	
+	public void ruleDetails(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		Integer id=1000051;
+	
+		JSONObject gtt = smartConnect.gttRuleDetails(id);
+	}
+	
+	@SuppressWarnings("serial")
+	public void ruleList(SmartConnect smartConnect)throws SmartAPIException, IOException{
+		
+		List<String> status=new ArrayList<String>(){{
+			add("NEW");
+			add("CANCELLED");
+			add("ACTIVE");
+			add("SENTTOEXCHANGE");
+			add("FORALL");
+			}};
+		Integer page=1;
+		Integer count=10;
+	
+		JSONArray gtt = smartConnect.gttRuleList(status,page,count);
+	}
+	
 	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task)
 			throws SmartAPIException {
 

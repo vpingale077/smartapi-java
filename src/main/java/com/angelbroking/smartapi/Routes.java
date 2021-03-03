@@ -14,7 +14,9 @@ public class Routes {
 
 	public Map<String, String> routes;
 	private static String _rootUrl = "https://apiconnect.angelbroking.com";
-	private static String _loginUrl = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword";
+	//private static String _rootUrl = "https://openapisuat.angelbroking.com";
+	//private static String _loginUrl = "https://openapisuat.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword";
+	private static String _loginUrl = "https://apiconnect.angelbroking.com/rest/auth/angelbroking/user/v1/loginByPassword";	
 	private static String _wsuri = "wss://omnefeeds.angelbroking.com/NestHtml5Mobile/socket/stream";
 
 	// Initialize all routes,
@@ -36,6 +38,11 @@ public class Routes {
 				put("api.order.rms.position", "/rest/secure/angelbroking/order/v1/getPosition");
 				put("api.order.rms.position.convert", "/rest/secure/angelbroking/order/v1/convertPosition");
 				put("api.ltp.data", "/rest/secure/angelbroking/order/v1/getLtpData");
+				put("api.gtt.create", "/gtt-service/rest/secure/angelbroking/gtt/v1/createRule");
+				put("api.gtt.modify","/gtt-service/rest/secure/angelbroking/gtt/v1/modifyRule");
+				put("api.gtt.cancel","/gtt-service/rest/secure/angelbroking/gtt/v1/cancelRule");
+				put("api.gtt.details","/rest/secure/angelbroking/gtt/v1/ruleDetails");
+				put("api.gtt.list","/rest/secure/angelbroking/gtt/v1/ruleList");
 			}
 		};
 	}

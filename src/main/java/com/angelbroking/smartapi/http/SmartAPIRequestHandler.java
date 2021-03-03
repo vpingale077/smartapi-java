@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,9 @@ public class SmartAPIRequestHandler {
 
 	private OkHttpClient client;
 	private String USER_AGENT = "javasmartapiconnect/3.0.0";
-
+	JSONObject apiheader= apiHeaders();
+	
+	
 	/**
 	 * Initialize request handler.
 	 * 
@@ -54,6 +57,61 @@ public class SmartAPIRequestHandler {
 		} else {
 			client = builder.build();
 		}
+	}
+	
+	public JSONObject apiHeaders() {
+		try {
+			JSONObject headers= new JSONObject();
+			// Local IP Address
+			InetAddress localHost = InetAddress.getLocalHost();
+			String clientLocalIP = localHost.getHostAddress();
+			headers.put("clientLocalIP",clientLocalIP);
+			// Public IP Address
+			URL urlName = new URL("https://bot.whatismyipaddress.com");
+			BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
+			String clientPublicIP = sc.readLine().trim();
+			headers.put("clientPublicIP",clientPublicIP);
+			String macAddress = null;
+			// MAC Address
+			// get all network interfaces of the current system
+			Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
+			// iterate over all interfaces
+			while (networkInterface.hasMoreElements()) {
+				// get an interface
+				NetworkInterface network = networkInterface.nextElement();
+				// get its hardware or mac address
+				byte[] macAddressBytes = network.getHardwareAddress();
+				if (macAddressBytes != null) {
+					// initialize a string builder to hold mac address
+					StringBuilder macAddressStr = new StringBuilder();
+					// iterate over the bytes of mac address
+					for (int i = 0; i < macAddressBytes.length; i++) {
+						// convert byte to string in hexadecimal form
+						macAddressStr.append(
+								String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
+					}
+					
+					macAddress = macAddressStr.toString();
+					if(macAddress != null) {
+						break;
+					}
+				}
+			}
+			headers.put("macAddress",macAddress);
+			String accept = "application/json";
+			headers.put("accept",accept);
+			String userType = "USER";
+			headers.put("userType",userType);
+			String sourceID = "WEB";
+			headers.put("sourceID",sourceID);
+			
+			System.out.print(headers);
+			return headers;
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			return null;
+		}	
+		
 	}
 
 	/**
@@ -197,53 +255,16 @@ public class SmartAPIRequestHandler {
 	 * @throws IOException
 	 */
 	public Request createGetRequest(String apiKey, String url, String accessToken) throws IOException {
-		HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
-		// Local IP Address
-		InetAddress localHost = InetAddress.getLocalHost();
-		String clientLocalIP = localHost.getHostAddress();
-
-		// Public IP Address
-		URL urlName = new URL("http://bot.whatismyipaddress.com");
-		BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
-		String clientPublicIP = sc.readLine().trim();
-		String macAddress = null;
 		
-		// MAC Address
-		// get all network interfaces of the current system
-		Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
-		// iterate over all interfaces
-		while (networkInterface.hasMoreElements()) {
-			// get an interface
-			NetworkInterface network = networkInterface.nextElement();
-			// get its hardware or mac address
-			byte[] macAddressBytes = network.getHardwareAddress();
-			if (macAddressBytes != null) {
-				// initialize a string builder to hold mac address
-				StringBuilder macAddressStr = new StringBuilder();
-				// iterate over the bytes of mac address
-				for (int i = 0; i < macAddressBytes.length; i++) {
-					// convert byte to string in hexadecimal form
-					macAddressStr.append(
-							String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
-				}
-				
-				macAddress = macAddressStr.toString();
-				if(macAddress != null) {
-					break;
-				}
-			}
-		}
+		HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
 
 		String privateKey = apiKey;
-		String accept = "application/json";
-		String userType = "USER";
-		String sourceID = "WEB";
 
 		return new Request.Builder().url(httpBuilder.build()).header("User-Agent", USER_AGENT)
 				.header("Authorization", "Bearer " + accessToken).header("Content-Type", "application/json")
-				.header("X-ClientLocalIP", clientLocalIP).header("X-ClientPublicIP", clientPublicIP)
-				.header("X-MACAddress", macAddress).header("Accept", accept).header("X-PrivateKey", privateKey)
-				.header("X-UserType", userType).header("X-SourceID", sourceID).build();
+				.header("X-ClientLocalIP", apiheader.getString("clientLocalIP")).header("X-ClientPublicIP", apiheader.getString("clientPublicIP"))
+				.header("X-MACAddress", apiheader.getString("macAddress")).header("Accept", apiheader.getString("accept")).header("X-PrivateKey", privateKey)
+				.header("X-UserType", apiheader.getString("userType")).header("X-SourceID", apiheader.getString("sourceID")).build();
 	}
 
 	/**
@@ -283,51 +304,11 @@ public class SmartAPIRequestHandler {
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 			RequestBody body = RequestBody.create(params.toString(), JSON);
 
-			// Local IP Address
-			InetAddress localHost = InetAddress.getLocalHost();
-			String clientLocalIP = localHost.getHostAddress();
-
-			// Public IP Address
-			URL urlName = new URL("http://bot.whatismyipaddress.com");
-			BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
-			String clientPublicIP = sc.readLine().trim();
-
-			String macAddress = null;
-			// MAC Address
-			// get all network interfaces of the current system
-			Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
-			// iterate over all interfaces
-			while (networkInterface.hasMoreElements()) {
-				// get an interface
-				NetworkInterface network = networkInterface.nextElement();
-				// get its hardware or mac address
-				byte[] macAddressBytes = network.getHardwareAddress();
-				if (macAddressBytes != null) {
-					// initialize a string builder to hold mac address
-					StringBuilder macAddressStr = new StringBuilder();
-					// iterate over the bytes of mac address
-					for (int i = 0; i < macAddressBytes.length; i++) {
-						// convert byte to string in hexadecimal form
-						macAddressStr.append(
-								String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
-					}
-					
-					macAddress = macAddressStr.toString();
-					if(macAddress != null) {
-						break;
-					}
-				}
-			}
-
 			String privateKey = apiKey;
-			String accept = "application/json";
-			String userType = "USER";
-			String sourceID = "WEB";
-
 			Request request = new Request.Builder().url(url).post(body).header("Content-Type", "application/json")
-					.header("X-ClientLocalIP", clientLocalIP).header("X-ClientPublicIP", clientPublicIP)
-					.header("X-MACAddress", macAddress).header("Accept", accept).header("X-PrivateKey", privateKey)
-					.header("X-UserType", userType).header("X-SourceID", sourceID).build();
+					.header("X-ClientLocalIP",  apiheader.getString("clientLocalIP")).header("X-ClientPublicIP", apiheader.getString("clientPublicIP"))
+					.header("X-MACAddress", apiheader.getString("macAddress")).header("Accept", apiheader.getString("accept")).header("X-PrivateKey", privateKey)
+					.header("X-UserType", apiheader.getString("userType")).header("X-SourceID", apiheader.getString("sourceID")).build();
 			return request;
 		} catch (Exception e) {
 			System.out.println("exception createPostRequest");
@@ -351,51 +332,13 @@ public class SmartAPIRequestHandler {
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 			RequestBody body = RequestBody.create(params.toString(), JSON);
 
-			// Local IP Address
-			InetAddress localHost = InetAddress.getLocalHost();
-			String clientLocalIP = localHost.getHostAddress();
-
-			// Public IP Address
-			URL urlName = new URL("https://bot.whatismyipaddress.com");
-			BufferedReader sc = new BufferedReader(new InputStreamReader(urlName.openStream()));
-			String clientPublicIP = sc.readLine().trim();
-			String macAddress = null;
-			// MAC Address
-			// get all network interfaces of the current system
-			Enumeration<NetworkInterface> networkInterface = NetworkInterface.getNetworkInterfaces();
-			// iterate over all interfaces
-			while (networkInterface.hasMoreElements()) {
-				// get an interface
-				NetworkInterface network = networkInterface.nextElement();
-				// get its hardware or mac address
-				byte[] macAddressBytes = network.getHardwareAddress();
-				if (macAddressBytes != null) {
-					// initialize a string builder to hold mac address
-					StringBuilder macAddressStr = new StringBuilder();
-					// iterate over the bytes of mac address
-					for (int i = 0; i < macAddressBytes.length; i++) {
-						// convert byte to string in hexadecimal form
-						macAddressStr.append(
-								String.format("%02X%s", macAddressBytes[i], (i < macAddressBytes.length - 1) ? "-" : ""));
-					}
-					
-					macAddress = macAddressStr.toString();
-					if(macAddress != null) {
-						break;
-					}
-				}
-			}
-
 			String privateKey = apiKey;
-			String accept = "application/json";
-			String userType = "USER";
-			String sourceID = "WEB";
+
 
 			Request request = new Request.Builder().url(url).post(body).header("Content-Type", "application/json")
-					.header("Authorization", "Bearer " + accessToken).header("X-ClientLocalIP", clientLocalIP)
-					.header("X-ClientPublicIP", clientPublicIP).header("X-MACAddress", macAddress)
-					.header("Accept", accept).header("X-PrivateKey", privateKey).header("X-UserType", userType)
-					.header("X-SourceID", sourceID).build();
+					.header("Authorization", "Bearer " + accessToken).header("X-ClientLocalIP",  apiheader.getString("clientLocalIP")).header("X-ClientPublicIP", apiheader.getString("clientPublicIP"))
+					.header("X-MACAddress", apiheader.getString("macAddress")).header("Accept", apiheader.getString("accept")).header("X-PrivateKey", privateKey)
+					.header("X-UserType", apiheader.getString("userType")).header("X-SourceID", apiheader.getString("sourceID")).build();
 			return request;
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

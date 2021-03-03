@@ -13,7 +13,7 @@ public class Test {
 			SmartConnect smartConnect = new SmartConnect();
 
 			// PROVIDE YOUR API KEY HERE
-			smartConnect.setApiKey("<your_api_key>");
+			smartConnect.setApiKey("smartapi_key");
 
 			// Set session expiry callback.
 			smartConnect.setSessionExpiryHook(new SessionExpiryHook() {
@@ -23,7 +23,7 @@ public class Test {
 				}
 			});
 
-			User user = smartConnect.generateSession("<clientId>", "<password>");
+			User user = smartConnect.generateSession("S212741","angel@123");
 			System.out.println(user.getAccessToken());
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
@@ -51,25 +51,41 @@ public class Test {
 
 			System.out.println("getOrder");
 			examples.getOrder(smartConnect);
-
+//
 			System.out.println("getLTP");
 			examples.getLTP(smartConnect);
-
+//
 			System.out.println("getTrades");
 			examples.getTrades(smartConnect);
-
+//
 			System.out.println("getRMS");
 			examples.getRMS(smartConnect);
-
+//
 			System.out.println("getHolding");
 			examples.getHolding(smartConnect);
-
+//
 			System.out.println("getPosition");
 			examples.getPosition(smartConnect);
-
+//
 			System.out.println("convertPosition");
 			examples.convertPosition(smartConnect);
-
+		
+			System.out.println("createRule");
+			examples.createRule(smartConnect);
+			
+			System.out.println("ModifyRule");
+			examples.modifyRule(smartConnect);
+			
+			System.out.println("cancelRule");
+			examples.cancelRule(smartConnect);
+			
+			System.out.println("Rule Details");
+			examples.ruleDetails(smartConnect);
+//			
+			System.out.println("Rule List");
+			examples.ruleList(smartConnect);
+		
+			
 			System.out.println("logout");
 			examples.logout(smartConnect);
 
@@ -81,7 +97,7 @@ public class Test {
 			String feedToken = user.getFeedToken();
 			String strWatchListScript = "nse_cm|2885&nse_cm|1594&nse_cm|11536&mcx_fo|221658";
 			String task = "mw";
-			examples.tickerUsage(clientId, feedToken, strWatchListScript, task);
+			//examples.tickerUsage(clientId, feedToken, strWatchListScript, task);
 
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());
