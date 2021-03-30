@@ -23,7 +23,7 @@ public class Test {
 				}
 			});
 
-			User user = smartConnect.generateSession("S212741","angel@123");
+			User user = smartConnect.generateSession("S212741","abc222");
 			System.out.println(user.getAccessToken());
 			smartConnect.setAccessToken(user.getAccessToken());
 			smartConnect.setUserId(user.getUserId());
@@ -85,6 +85,8 @@ public class Test {
 			System.out.println("Rule List");
 			examples.ruleList(smartConnect);
 		
+			System.out.println("Historic candle Data");
+			examples.getCandleData(smartConnect);
 			
 			System.out.println("logout");
 			examples.logout(smartConnect);

@@ -153,6 +153,7 @@ public class Examples {
 		Gtt gtt = smartConnect.gttCreateRule(gttParams);
 	}
 	
+	/** Modify Gtt Rule */
 	public void modifyRule(SmartConnect smartConnect)throws SmartAPIException,IOException{
 		GttParams gttParams= new GttParams();
 		
@@ -172,6 +173,7 @@ public class Examples {
 		Gtt gtt = smartConnect.gttModifyRule(id,gttParams);
 	}
 	
+	/** Cancel Gtt Rule */
 	public void cancelRule(SmartConnect smartConnect)throws SmartAPIException, IOException{
 		Integer id=1000051;
 		String symboltoken="3045";
@@ -180,12 +182,14 @@ public class Examples {
 		Gtt gtt = smartConnect.gttCancelRule(id,symboltoken,exchange);
 	}
 	
+	/** Gtt Rule Details */
 	public void ruleDetails(SmartConnect smartConnect)throws SmartAPIException, IOException{
 		Integer id=1000051;
 	
 		JSONObject gtt = smartConnect.gttRuleDetails(id);
 	}
 	
+	/** Gtt Rule Lists */
 	@SuppressWarnings("serial")
 	public void ruleList(SmartConnect smartConnect)throws SmartAPIException, IOException{
 		
@@ -202,6 +206,20 @@ public class Examples {
 		JSONArray gtt = smartConnect.gttRuleList(status,page,count);
 	}
 	
+	/** Historic Data
+	 * @param requestObject */
+	public void getCandleData(SmartConnect smartConnect) throws SmartAPIException, IOException {
+
+		JSONObject requestObejct = new JSONObject();
+		requestObejct.put("exchange", "NSE");
+		requestObejct.put("symboltoken", "3045");
+		requestObejct.put("interval", "THREE_MINUTE");
+		requestObejct.put("fromdate", "2021-03-08 09:00");
+		requestObejct.put("todate", "2021-03-09 09:20");
+
+		String response = smartConnect.candleData(requestObejct);
+	}
+
 	public void tickerUsage(String clientId, String feedToken, String strWatchListScript, String task)
 			throws SmartAPIException {
 
@@ -262,6 +280,7 @@ public class Examples {
 		// tickerProvider.disconnect();
 
 	}
+	
 
 	/** Logout user. */
 	public void logout(SmartConnect smartConnect) throws SmartAPIException, IOException {

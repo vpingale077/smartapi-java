@@ -148,11 +148,7 @@ public class SmartConnect {
 	 * @param requestToken received from login process.
 	 * @param apiSecret    which is unique for each aap.
 	 * @return User is the user model which contains user and session details.
-	 * @throws SmartAPIException
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public User generateSession(String clientCode, String password) {
 		try {
@@ -190,8 +186,7 @@ public class SmartConnect {
 	 * @param refreshToken is the refresh token obtained after generateSession.
 	 * @param apiSecret    is unique for each app.
 	 * @return TokenSet contains user id, refresh token, api secret.
-	 * @throws IOException       is thrown when there is connection error.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
+
 	 */
 	public TokenSet renewAccessToken(String accessToken, String refreshToken) {
 		try {
@@ -238,8 +233,7 @@ public class SmartConnect {
 	 * Get the profile details of the use.
 	 * 
 	 * @return Profile is a POJO which contains profile related data.
-	 * @throws IOException       is thrown when there is connection error.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
+
 	 */
 	public User getProfile() {
 		try {
@@ -260,10 +254,7 @@ public class SmartConnect {
 	 * @param variety     variety="regular". Order variety can be bo, co, amo,
 	 *                    regular.
 	 * @return Order contains only orderId.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public Order placeOrder(OrderParams orderParams, String variety) {
 		
@@ -318,10 +309,7 @@ public class SmartConnect {
 	 *                    regular.
 	 * @param orderId     order id of the order being modified.
 	 * @return Order object contains only orderId.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public Order modifyOrder(String orderId, OrderParams orderParams, String variety){
 		try {
@@ -367,10 +355,7 @@ public class SmartConnect {
 	 * @param variety [variety="regular"]. Order variety can be bo, co, amo,
 	 *                regular.
 	 * @return Order object contains only orderId.
-	 * @throws SmartAPIException is thrown for all Angel trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public Order cancelOrder(String orderId, String variety) {
 		try {
@@ -396,8 +381,7 @@ public class SmartConnect {
 	 * @return List of multiple stages an order has gone through in the system.
 	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
 	 * @param orderId is the order id which is obtained from orderbook.
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	@SuppressWarnings({ })
 	public JSONObject getOrderHistory(String clientId) {
@@ -419,10 +403,7 @@ public class SmartConnect {
 	 * 265}.
 	 * 
 	 * @return Map of String and LTPQuote.
-	 * @param instruments is the array of tradingsymbol and exchange or instruments
-	 *                    token.
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws IOException       is thrown when there is connection related error.
+
 	 */
 	public JSONObject getLTP(String exchange, String tradingSymbol, String symboltoken){
 		try {
@@ -446,10 +427,6 @@ public class SmartConnect {
 	 * Retrieves list of trades executed.
 	 * 
 	 * @return List of trades.
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
 	 */
 	public JSONObject getTrades() {
 		try {
@@ -488,10 +465,7 @@ public class SmartConnect {
 	 * Retrieves Holding.
 	 * 
 	 * @return Object of Holding.
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public JSONObject getHolding(){
 		try {
@@ -509,10 +483,7 @@ public class SmartConnect {
 	 * Retrieves position.
 	 * 
 	 * @return Object of position.
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	public JSONObject getPosition(){
 		try {
@@ -552,10 +523,7 @@ public class SmartConnect {
 	 * 
 	 * @param gttParams is gtt Params.
 	 * @return Gtt contains only orderId.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	
 	public Gtt gttCreateRule(GttParams gttParams) {
@@ -603,10 +571,7 @@ public class SmartConnect {
 	 * 
 	 * @param gttParams is gtt Params.
 	 * @return Gtt contains only orderId.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
+
 	 */
 	
 	public Gtt gttModifyRule(Integer id,GttParams gttParams){
@@ -650,10 +615,6 @@ public class SmartConnect {
 	 * 
 	 * @param gttParams is gtt Params.
 	 * @return Gtt contains only orderId.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
 	 */
 	
 	public Gtt gttCancelRule(Integer id, String symboltoken, String exchange) {
@@ -681,10 +642,6 @@ public class SmartConnect {
 	 * 
 	 * @param id is gtt rule id.
 	 * @return returns the details of gtt rule.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
 	 */
 	
 	public JSONObject gttRuleDetails(Integer id){
@@ -713,10 +670,6 @@ public class SmartConnect {
 	 * @param page is no of page
 	 * @param count is the count of gtt rules
 	 * @return returns the detailed list  of gtt rules.
-	 * @throws SmartAPIException is thrown for all SmartAPI trade related errors.
-	 * @throws JSONException     is thrown when there is exception while parsing
-	 *                           response.
-	 * @throws IOException       is thrown when there is connection error.
 	 */
 	public JSONArray gttRuleList(List<String> status,Integer page,Integer count) {
 		try {
@@ -736,13 +689,29 @@ public class SmartConnect {
 		}
 		
 	}
-	
+	/**
+	 * Get Historic Data.
+	 * 
+	 * @param params is historic data params.
+	 * @return returns the details of historic data.
+	 */
+	public String candleData(JSONObject params) {
+		try {
+		String url = routes.get("api.candle.data");
+		JSONObject response = smartAPIRequestHandler.postRequest(this.apiKey, url, params, accessToken);
+		System.out.println(response);
+		return response.getString("data");
+		}
+		catch(Exception | SmartAPIException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
 	/**
 	 * Logs out user by invalidating the access token.
 	 * 
 	 * @return JSONObject which contains status
-	 * @throws SmartAPIException is thrown for all Smart API trade related errors.
-	 * @throws IOException       is thrown when there is connection related error.
+
 	 */
 
 	public JSONObject logout() {
