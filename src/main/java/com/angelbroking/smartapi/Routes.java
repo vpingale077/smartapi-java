@@ -43,6 +43,7 @@ public class Routes {
 				put("api.gtt.cancel","/gtt-service/rest/secure/angelbroking/gtt/v1/cancelRule");
 				put("api.gtt.details","/rest/secure/angelbroking/gtt/v1/ruleDetails");
 				put("api.gtt.list","/rest/secure/angelbroking/gtt/v1/ruleList");
+				put("api.candle.data","/rest/secure/angelbroking/historical/v1/getCandleData");
 			}
 		};
 	}
